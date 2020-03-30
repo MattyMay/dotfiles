@@ -1,15 +1,15 @@
 - defaults:
     link:
       relink: true
+      create: true
 
 - clean: ['~']
 
 - link:
-  ~/.dotfiles: ''
-  ~/.vimrc: vimrc
-  ~/.bash_profile: bash_profile
-  ~/.bashrc: bashrc
-  ~/.bash_aliases: bash_aliases
+    ~/.vimrc:
+    ~/.bash_profile:
+    ~/.bashrc:
+    ~/.bash_aliases:
 
 - shell:
-    - [git submodule update --init --recursive, Installing submodules]
+  - [git submodule update --init --recursive, Installing submodules]

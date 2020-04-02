@@ -8,6 +8,13 @@ case $- in
       *) return;;
 esac
 
+# Start tmux automatically, if it exists
+#if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+#        tmux attach -t default || tmux new -s default
+#fi
+
+export EDITOR=vim
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth

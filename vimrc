@@ -1,3 +1,4 @@
+" ************** VUNDLE STUFF ********************
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
@@ -20,6 +21,7 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
+" ************************************************
 
 " Color stuff
 colorscheme codedark
@@ -51,6 +53,11 @@ set shortmess+=I
 set number " Show line numbers.
 set relativenumber
 
+" splits keybinds
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 " More natural splits
 set splitbelow
 set splitright
@@ -64,6 +71,7 @@ set backspace=indent,eol,start
 set hidden
 
 " Search stuff
+set incsearch
 set ignorecase
 set smartcase
 set hls

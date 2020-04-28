@@ -8,6 +8,7 @@ call vundle#begin()
 Plugin 'ycm-core/YouCompleteMe' " Auto complete
 Plugin 'ctrlpvim/ctrlp.vim' " Fuzzy file finder
 Plugin 'sheerun/vim-polyglot' " Syntax highlighting
+Plugin 'https://github.com/tomasiser/vim-code-dark' " vscode theme
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:

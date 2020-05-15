@@ -5,6 +5,7 @@ filetype off                  " required
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
+Plugin 'preservim/nerdtree' " Tree file explorer
 Plugin 'ycm-core/YouCompleteMe' " Auto complete
 Plugin 'ctrlpvim/ctrlp.vim' " Fuzzy file finder
 Plugin 'sheerun/vim-polyglot' " Syntax highlighting
@@ -27,6 +28,12 @@ filetype plugin indent on    " required
 " Color stuff
 colorscheme codedark
 syntax on
+
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
 
 " C-style language auto-complete
 let g:ycm_clangd_binary_path = "usr/bin/clangd"
@@ -54,14 +61,21 @@ set shortmess+=I
 set number " Show line numbers.
 set relativenumber
 
+" ***** ADDED KEYBINDS ******
+" NERDTree toggle
+map <C-\> :NERDTreeToggle<CR>
 " splits keybinds
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
+
 " More natural splits
 set splitbelow
 set splitright
+
+" NERDTree on right
+let g:NERDTreeWinPos = "right"
 
 " Always show the status line at the bottom, even if you only have one window open.
 set laststatus=2

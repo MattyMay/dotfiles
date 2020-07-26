@@ -5,11 +5,18 @@ filetype off                  " required
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
+
 Plugin 'preservim/nerdtree' " Tree file explorer
 Plugin 'ycm-core/YouCompleteMe' " Auto complete
 Plugin 'ctrlpvim/ctrlp.vim' " Fuzzy file finder
 Plugin 'sheerun/vim-polyglot' " Syntax highlighting
-Plugin 'https://github.com/tomasiser/vim-code-dark' " vscode theme
+Plugin 'tomasiser/vim-code-dark' " vscode theme
+Plugin 'dense-analysis/ale' " Linter
+Plugin 'rhysd/vim-clang-format' " Clang-format
+Plugin 'kana/vim-operator-user' " Needed for clang-format
+Plugin 'tmsvg/pear-tree' " Pair completion
+Plugin 'Yggdroot/indentLine' " Indent guide
+
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:
@@ -25,9 +32,24 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 " ************************************************
 
+" Pair completion
+let g:pear_tree_repeatable_expand = 1
+let g:pear_tree_smart_openers = 0
+let g:pear_tree_smart_closers = 0
+let g:pear_tree_smart_backspace = 0
+
+" Clang stuff
+let g:clang_format#code_style = "google"
+let g:clang_format#style_options = {
+    \ "AccessModifierOffset" : -2}
+
+" Linter stuff
+let g:ale_sign_column_always = 1
+
 " Color stuff
 colorscheme codedark
 syntax on
+set colorcolumn=72
 
 if exists('+termguicolors')
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
@@ -62,6 +84,7 @@ set number " Show line numbers.
 set relativenumber
 
 " ***** ADDED KEYBINDS ******
+
 " NERDTree toggle
 map <C-\> :NERDTreeToggle<CR>
 " splits keybinds
@@ -69,6 +92,14 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
+
+" moving lines/selections
+" nnoremap <C-S-J> :m .+1<CR>==
+" nnoremap <C-S-K> :m .-2<CR>==
+" inoremap <C-S-J> <Esc>:m .+1<CR>==gi
+" inoremap <C-S-K> <Esc>:m .-2<CR>==gi
+" vnoremap <C-S-J> :m '>+1<CR>gv=gv
+" vnoremap <C-S-K> :m '<-2<CR>gv=gv
 
 " More natural splits
 set splitbelow

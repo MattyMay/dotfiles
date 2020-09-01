@@ -71,5 +71,13 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-# Prompt
+# Prompt (note: any conda command will add conda info to prompt)
 . ~/.bash_prompt
+
+# First login will start ssh-agent. Every shell after will share it.
+if [ ! -S ~/.ssh/ssh_auth_sock ]; then
+  eval `ssh-agent`
+  ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+fi
+export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
+ssh-add -l > /dev/null || ssh-add

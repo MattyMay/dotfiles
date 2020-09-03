@@ -6,16 +6,26 @@ GREY=$(tput setaf 244)
 RED=$(tput setaf 1)
 YELLOW=$(tput setaf 3)
 
-git_prompt() {
+# echos branch name if in a repo
+git_branch() {
   BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
-
   if [ ! -z $BRANCH ]; then
-    echo -n "$YELLOW$BRANCH"
-
-    if [ ! -z "$(git status --short)" ]; then
-      echo " ${RED}✗"
-    fi
+    echo -n "$BRANCH"
   fi
 }
 
-PS1='\[$BLUE\]\[$BOLD\]\w$(git_prompt)\]\[$GREY\] >>> \[$RESET\]'
+# echos ✗ if not clean
+git_changes() {
+  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
+    if [ ! -z $BRANCH ]; then
+      if [ ! -z "$(git status --short)" ]; then
+        echo " ✗"
+      fi
+    fi
+}
+
+PS1="\[$BLUE$BOLD\]\w" # working directory
+PS1+="\[$YELLOW\]\$(git_branch)" # git branch
+PS1+="\[$RED\]\$(git_changes)" # x if not clean
+PS1+="\[$GREY\] >>> " # prompt
+PS1+="\[$RESET\]" # reset colors

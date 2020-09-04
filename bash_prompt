@@ -24,7 +24,8 @@ git_changes() {
     fi
 }
 
-PS1="\[$BLUE$BOLD\]\w" # working directory
+PS1="\h:"
+PS1+="\[$BLUE$BOLD\]\w" # working directory
 PS1+="\[$YELLOW\]\$(git_branch)" # git branch
 PS1+="\[$RED\]\$(git_changes)" # x if not clean
 PS1+="\[$GREY\] >>> " # prompt

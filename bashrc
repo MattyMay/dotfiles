@@ -7,6 +7,9 @@ esac
 # Editor
 export EDITOR=vim
 
+# Vim keybinds
+set -o vi
+
 # don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoreboth
 

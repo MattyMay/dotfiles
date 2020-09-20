@@ -32,6 +32,9 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 " ************************************************
 
+" sync clipboard register and default register
+set clipboard^=unnamed
+
 " Pair completion
 let g:pear_tree_repeatable_expand = 1
 let g:pear_tree_smart_openers = 0

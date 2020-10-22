@@ -6,6 +6,7 @@ filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
+Plugin 'christoomey/vim-tmux-navigator' " Seamless vim/tmux pane navigation
 Plugin 'tpope/vim-commentary' " Comments - use 'gcc' for line, 'gc' in visual or to comment out a target of a command
 Plugin 'preservim/nerdtree' " Tree file explorer
 Plugin 'ycm-core/YouCompleteMe' " Auto complete
@@ -91,26 +92,12 @@ set relativenumber
 
 " NERDTree toggle
 map <C-\> :NERDTreeToggle<CR>
-" splits keybinds
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
-
-" moving lines/selections
-" nnoremap <C-S-J> :m .+1<CR>==
-" nnoremap <C-S-K> :m .-2<CR>==
-" inoremap <C-S-J> <Esc>:m .+1<CR>==gi
-" inoremap <C-S-K> <Esc>:m .-2<CR>==gi
-" vnoremap <C-S-J> :m '>+1<CR>gv=gv
-" vnoremap <C-S-K> :m '<-2<CR>gv=gv
+" NERDTree on right
+let g:NERDTreeWinPos = "right"
 
 " More natural splits
 set splitbelow
 set splitright
-
-" NERDTree on right
-let g:NERDTreeWinPos = "right"
 
 " Always show the status line at the bottom, even if you only have one window open.
 set laststatus=2

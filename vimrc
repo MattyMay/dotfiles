@@ -6,13 +6,14 @@ filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
+" Plugin 'tomasiser/vim-code-dark' " vscode theme
+Plugin 'joshdick/onedark.vim' " Onedark theme
 Plugin 'christoomey/vim-tmux-navigator' " Seamless vim/tmux pane navigation
 Plugin 'tpope/vim-commentary' " Comments - use 'gcc' for line, 'gc' in visual or to comment out a target of a command
 Plugin 'preservim/nerdtree' " Tree file explorer
 Plugin 'ycm-core/YouCompleteMe' " Auto complete
 Plugin 'ctrlpvim/ctrlp.vim' " Fuzzy file finder
 Plugin 'sheerun/vim-polyglot' " Syntax highlighting
-Plugin 'tomasiser/vim-code-dark' " vscode theme
 Plugin 'dense-analysis/ale' " Linter
 Plugin 'rhysd/vim-clang-format' " Clang-format
 Plugin 'kana/vim-operator-user' " Needed for clang-format
@@ -52,9 +53,9 @@ let g:clang_format#style_options = {
 let g:ale_sign_column_always = 1
 
 " Color stuff
-colorscheme codedark
+colorscheme onedark
 syntax on
-set colorcolumn=72
+set colorcolumn=80
 
 if exists('+termguicolors')
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"

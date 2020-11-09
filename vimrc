@@ -6,19 +6,23 @@ filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
+" Colors, themes, etc
+Plugin 'itchyny/lightline.vim' " fancy status bar
+Plugin 'sheerun/vim-polyglot' " Syntax highlighting
 " Plugin 'tomasiser/vim-code-dark' " vscode theme
 Plugin 'joshdick/onedark.vim' " Onedark theme
+Plugin 'Yggdroot/indentLine' " Indent guide
+
+" Helper functionality
 Plugin 'christoomey/vim-tmux-navigator' " Seamless vim/tmux pane navigation
 Plugin 'tpope/vim-commentary' " Comments - use 'gcc' for line, 'gc' in visual or to comment out a target of a command
 Plugin 'preservim/nerdtree' " Tree file explorer
 Plugin 'ycm-core/YouCompleteMe' " Auto complete
 Plugin 'ctrlpvim/ctrlp.vim' " Fuzzy file finder
-Plugin 'sheerun/vim-polyglot' " Syntax highlighting
 Plugin 'dense-analysis/ale' " Linter
 Plugin 'rhysd/vim-clang-format' " Clang-format
 Plugin 'kana/vim-operator-user' " Needed for clang-format
 Plugin 'tmsvg/pear-tree' " Pair completion
-Plugin 'Yggdroot/indentLine' " Indent guide
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -56,7 +60,9 @@ let g:ale_sign_column_always = 1
 colorscheme onedark
 syntax on
 set colorcolumn=80
-
+let g:lightline = {
+  \ 'colorscheme': 'onedark',
+  \ }
 if exists('+termguicolors')
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"

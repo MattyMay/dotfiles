@@ -8,7 +8,6 @@ call vundle#begin()
 
 " Colors, themes, etc
 Plugin 'itchyny/lightline.vim' " fancy status bar
-Plugin 'sheerun/vim-polyglot' " Syntax highlighting
 " Plugin 'tomasiser/vim-code-dark' " vscode theme
 Plugin 'joshdick/onedark.vim' " Onedark theme
 Plugin 'Yggdroot/indentLine' " Indent guide
@@ -24,6 +23,16 @@ Plugin 'rhysd/vim-clang-format' " Clang-format
 Plugin 'kana/vim-operator-user' " Needed for clang-format
 Plugin 'tmsvg/pear-tree' " Pair completion
 
+" Neovim specific plugins
+if has('nvim')
+    Plugin 'nvim-treesitter/nvim-treesitter' " Better highlighting
+
+" Vim specific plugins
+else
+    Plugin 'sheerun/vim-polyglot' " Syntax highlighting
+
+endif
+
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:
@@ -38,6 +47,11 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 " ************************************************
+
+" Neovim specific settings
+if has('nvim')
+    set noshowcmd noruler
+endif
 
 " sync clipboard register and default register
 set clipboard^=unnamed

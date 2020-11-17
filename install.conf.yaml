@@ -15,6 +15,7 @@
     ~/.inputrc:
     ~/.ideavimrc:
     ~/.config/nvim/init.vim:
+    ~/.alacritty.yml:
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

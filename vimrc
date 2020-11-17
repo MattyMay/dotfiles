@@ -8,7 +8,6 @@ call vundle#begin()
 
 " Colors, themes, etc
 Plugin 'itchyny/lightline.vim' " fancy status bar
-" Plugin 'tomasiser/vim-code-dark' " vscode theme
 Plugin 'joshdick/onedark.vim' " Onedark theme
 Plugin 'Yggdroot/indentLine' " Indent guide
 
@@ -35,58 +34,46 @@ endif
 
 call vundle#end()            " required
 filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
-" ************************************************
 
+" **************** VIM / NVIM *********************
 " Neovim specific settings
 if has('nvim')
-    set noshowcmd noruler
+    set noshowcmd noruler " can slow things down in nvim
+else
+    " C-style language auto-complete
+    let g:ycm_clangd_binary_path = "usr/bin/clangd"
 endif
 
-" sync clipboard register and default register
-set clipboard^=unnamed
-
-" Pair completion
+" **************** PAIR COMPLETION ****************
 let g:pear_tree_repeatable_expand = 1
 let g:pear_tree_smart_openers = 0
 let g:pear_tree_smart_closers = 0
 let g:pear_tree_smart_backspace = 0
 
-" Clang stuff
+" Clang stuff - default format style
 let g:clang_format#code_style = "google"
 let g:clang_format#style_options = {
+    \ "IndentWidth" : 4,
     \ "AccessModifierOffset" : -2}
 
 " Linter stuff
 let g:ale_sign_column_always = 1
 
-" Color stuff
+" ************** COLOR, SYNTAX ********************
 colorscheme onedark
 syntax on
+highlight Comment cterm=italic gui=italic
 set colorcolumn=80
 let g:lightline = {
   \ 'colorscheme': 'onedark',
   \ }
-if exists('+termguicolors')
+if exists('+termguicolors') " fix weird colors in tmux
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors
 endif
 
-" C-style language auto-complete
-let g:ycm_clangd_binary_path = "usr/bin/clangd"
-
-" Whitespace
+" *************** WHITE SPACE **********************
 set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab ai smartindent
 set showbreak=↪\
 set list
@@ -94,10 +81,18 @@ set listchars=tab:→\ ,nbsp:␣,space:·,extends:⟩,precedes:⟨
 highlight SpecialKey ctermfg=239 guifg=DimGrey
 let g:indentLine_char = '|' " indent level lines
 
+
+
+" *************** KEYBINDS *************************
+" NERDTree toggle
+map <C-\> :NERDTreeToggle<CR>
+" NERDTree on right
+let g:NERDTreeWinPos = "right"
+
+" ****************** MISC **************************
 " Cursor
 let &t_SI = "\e[5 q"
 let &t_EI = "\e[0 q"
-
 augroup myCmds
 au!
 autocmd VimEnter * silent !echo -ne "\e[0 q"
@@ -108,21 +103,8 @@ set shortmess+=I
 
 set number " Show line numbers.
 set relativenumber
-
-" ***** ADDED KEYBINDS ******
-
-" remove TmuxNavigatePrevious
-let g:tmux_navigator_no_mappings = 1
-nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
-nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
-nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
-nnoremap <silent> <Nop> :TmuxNavigatePrevious<cr>
-
-" NERDTree toggle
-map <C-\> :NERDTreeToggle<CR>
-" NERDTree on right
-let g:NERDTreeWinPos = "right"
+" sync clipboard register and default register
+set clipboard^=unnamed
 
 " More natural splits
 set splitbelow

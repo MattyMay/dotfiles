@@ -120,6 +120,11 @@ set clipboard+=unnamedplus
 set splitbelow
 set splitright
 
+" termdebug stuff
+packadd termdebug
+let g:termdebug_wide=1
+tnoremap <Esc> <C-\><C-n>
+
 " Always show the status line at the bottom, even if you only have one window open.
 set laststatus=2
 

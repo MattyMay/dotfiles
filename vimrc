@@ -14,6 +14,7 @@ Plugin 'itchyny/lightline.vim' " fancy status bar
 Plugin 'joshdick/onedark.vim' " Onedark theme
 Plugin 'Yggdroot/indentLine' " Indent guide
 
+
 " Helper functionality
 Plugin 'neoclide/coc.nvim' " Auto complete / LSP
 Plugin 'christoomey/vim-tmux-navigator' " Seamless vim/tmux pane navigation
@@ -77,6 +78,7 @@ if exists('+termguicolors') " fix weird colors in tmux
   set termguicolors
 endif
 
+
 " *************** WHITE SPACE **********************
 set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab ai smartindent
 set showbreak=↪\
@@ -101,6 +103,9 @@ let g:NERDTreeWinPos = "right"
 nmap Q <Nop> " 'Q' in normal mode enters Ex mode. You almost never want this.
 
 " ****************** MISC **************************
+" Folding
+set foldmethod=syntax
+
 " Cursor
 let &t_SI = "\e[5 q"
 let &t_EI = "\e[0 q"

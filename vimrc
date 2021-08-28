@@ -23,6 +23,7 @@ Plugin 'ctrlpvim/ctrlp.vim' " Fuzzy file finder
 Plugin 'rhysd/vim-clang-format' " Clang-format
 Plugin 'kana/vim-operator-user' " Needed for clang-format
 Plugin 'tmsvg/pear-tree' " Pair completion
+Plugin 'mattn/emmet-vim' " Emmet (html expansion)
 
 " Neovim specific plugins
 if has('nvim')

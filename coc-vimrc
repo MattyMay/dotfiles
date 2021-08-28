@@ -184,13 +184,17 @@ function! SplitIfNotOpen(...)
 endfunction
 command! -nargs=+ CocSplitIfNotOpen :call SplitIfNotOpen(<f-args>)
 
+" Prettier command for JS
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
 let g:coc_global_extensions = [
+    \'coc-prettier',
     \'coc-json',
     \'coc-git',
     \'coc-clangd',
     \'coc-css',
     \'coc-html',
     \'coc-java',
-    \'coc-python',
+    \'coc-pyright',
     \'coc-sh',
     \'coc-vimlsp']

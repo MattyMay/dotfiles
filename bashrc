@@ -59,22 +59,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/mattm/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/mattm/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/mattm/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/mattm/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
 
-# Prompt (note: any conda command will add conda info to prompt)
+# Prompt
 . ~/.bash_prompt
 
 # First login will start ssh-agent. Every shell after will share it.
@@ -96,3 +82,4 @@ mkcd () {
     *) mkdir -p "./$1" && cd "./$1";;
   esac
 }
+. "$HOME/.cargo/env"

@@ -196,10 +196,5 @@ let g:coc_global_extensions = [
     \'coc-vimlsp',
     \'coc-tsserver']
 
-" Make pylint use the correct environment
-if $CONDA_PREFIX == ""
-  let s:current_python_path=$CONDA_PYTHON_EXE
-else
-  let s:current_python_path=$CONDA_PREFIX.'/bin/python'
-endif
-call coc#config('python', {'pythonPath': s:current_python_path})
+" Prettier function for js, etc.
+command! -nargs=0 Prettier :CocCommand prettier.formatFile

@@ -26,8 +26,5 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-# aliases
-# alias code="code-insiders"
-export TOKEN=NjYwNzI2MzA4Mzg0NDA3NTgz.XgwttQ.bSgvVIor9z1jM_IBLBpKxrIfW_Y
-export DB_USERNAME=mindreader_bot
-export DB_PASS=5ySb0sPh3QTMl4K1
+# source cargo env
+. "$HOME/.cargo/env"

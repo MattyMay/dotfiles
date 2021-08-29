@@ -81,3 +81,6 @@ mkcd () {
     *) mkdir -p "./$1" && cd "./$1";;
   esac
 }
+
+# cargo for rust
+. "$HOME/.cargo/env"

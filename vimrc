@@ -12,7 +12,8 @@ Plugin 'VundleVim/Vundle.vim'
 " colors, themes, etc
 Plugin 'itchyny/lightline.vim' " fancy status bar
 Plugin 'joshdick/onedark.vim' " Onedark theme
-Plugin 'Yggdroot/indentLine' " Indent guide
+" Plugin 'Yggdroot/indentLine' " Indent guide
+Plugin 'lukas-reineke/indent-blankline.nvim'
 
 
 " Helper functionality
@@ -25,6 +26,7 @@ Plugin 'rhysd/vim-clang-format' " Clang-format
 Plugin 'kana/vim-operator-user' " Needed for clang-format
 Plugin 'tmsvg/pear-tree' " Pair completion
 Plugin 'mattn/emmet-vim' " Emmet (html expansion)
+Plugin 'glench/vim-jinja2-syntax' " jinja2 highlighting/indent
 
 " Neovim specific plugins
 if has('nvim')
@@ -85,7 +87,6 @@ set showbreak=↪\
 set list
 set listchars=tab:→\ ,nbsp:␣,space:·,extends:⟩,precedes:⟨
 highlight SpecialKey ctermfg=239 guifg=DimGrey
-let g:indentLine_char = '|' " indent level lines
 
 " *************** KEYBINDS *************************
 " remove <C-\> for vim/tmux pane nav

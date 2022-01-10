@@ -17,6 +17,7 @@
     ~/.config/nvim/init.vim:
     ~/.alacritty.yml:
     ~/.coc-vimrc:
+    ~/.config/utop/init.ml:
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

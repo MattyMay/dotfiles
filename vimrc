@@ -102,6 +102,8 @@ map <C-\> :NERDTreeToggle<CR>
 let g:NERDTreeWinPos = "right"
 " Unbind some useless/annoying default key bindings.
 nmap Q <Nop> " 'Q' in normal mode enters Ex mode. You almost never want this.
+" Emmet tab to expand (avoid leader)
+let g:user_emmet_expandabbr_key = '<tab>'
 
 " ****************** MISC **************************
 " Folding

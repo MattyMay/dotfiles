@@ -84,3 +84,6 @@ mkcd () {
 
 # cargo for rust
 . "$HOME/.cargo/env"
+
+# opam env
+eval $(opam env)

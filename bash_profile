@@ -28,3 +28,6 @@ fi
 
 # source cargo env
 . "$HOME/.cargo/env"
+
+# opam configuration
+test -r /home/mattm/.opam/opam-init/init.sh && . /home/mattm/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true

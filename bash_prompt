@@ -47,7 +47,7 @@ function __shortpath {
     __git_branch_len
     len_git=$?
     len_prompt=${#1}
-    total_len=$((len_prompt+len_git))
+    total_len=$((len_prompt+len_git+host))
     if [[ $total_len -gt $2 ]]; then
         len=$2+3+$len_git
         echo "..."${1: -$len}

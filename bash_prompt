@@ -24,7 +24,13 @@ git_changes() {
     fi
 }
 
-PS1="\[$BLUE$BOLD\]\w" # working directory
+# set host if remote
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    host="@\h:"
+fi
+
+PS1="${host}"
+PS1+="\[$BLUE$BOLD\]\w" # working directory
 PS1+="\[$YELLOW\]\$(git_branch)" # git branch
 PS1+="\[$RED\]\$(git_changes)" # x if not clean
 PS1+="\[$GREY\] >>> " # prompt

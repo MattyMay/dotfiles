@@ -38,7 +38,7 @@ __git_changes() {
 
 # set host if remote
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    host="@\h:"
+    host="@"`hostname`
 fi
 
 # limit length of path + git branch in prompt
@@ -47,9 +47,10 @@ function __shortpath {
     __git_branch_len
     len_git=$?
     len_prompt=${#1}
-    total_len=$((len_prompt+len_git))
+    len_host=${#host}
+    total_len=$((len_prompt+len_git+len_host))
     if [[ $total_len -gt $2 ]]; then
-        len=$2+3+$len_git
+        len=$2+3+$len_git+$len_host
         echo "..."${1: -$len}
     else
         echo $1

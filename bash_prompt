@@ -1,3 +1,4 @@
+#!/bin/bash
 # Colors
 RESET=$(tput sgr0)
 BOLD=$(tput bold)
@@ -6,16 +7,27 @@ GREY=$(tput setaf 244)
 RED=$(tput setaf 1)
 YELLOW=$(tput setaf 3)
 
-# echos branch name if in a repo
-git_branch() {
+# echos branch name if in a repo, and returns length of branch name str
+__git_branch() {
   BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
   if [ ! -z $BRANCH ]; then
     echo -n "$BRANCH"
+    return ${#BRANCH}
   fi
+  return 0
+}
+
+# returns len of git branch string
+__git_branch_len() {
+  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
+  if [ ! -z $BRANCH ]; then
+    return ${#BRANCH}
+  fi
+  return 0
 }
 
 # echos ✗ if not clean
-git_changes() {
+__git_changes() {
   BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
     if [ ! -z $BRANCH ]; then
       if [ ! -z "$(git status --short)" ]; then
@@ -29,9 +41,24 @@ if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     host="@\h:"
 fi
 
+# limit length of path + git branch in prompt
+# arg1 should be '/w', arg2 should be max prompt length
+function __shortpath {
+    __git_branch_len
+    len_git=$?
+    len_prompt=${#1}
+    total_len=$((len_prompt+len_git))
+    if [[ $total_len -gt $2 ]]; then
+        len=$2+3+$len_git
+        echo "..."${1: -$len}
+    else
+        echo $1
+    fi
+}
+
 PS1="${host}"
-PS1+="\[$BLUE$BOLD\]\w" # working directory
-PS1+="\[$YELLOW\]\$(git_branch)" # git branch
-PS1+="\[$RED\]\$(git_changes)" # x if not clean
+PS1+="\[$BLUE$BOLD\]\$(__shortpath '\w' 40)" # working directory
+PS1+="\[$YELLOW\]\$(__git_branch)" # git branch
+PS1+="\[$RED\]\$(__git_changes)" # x if not clean
 PS1+="\[$GREY\] >>> " # prompt
 PS1+="\[$RESET\]" # reset colors

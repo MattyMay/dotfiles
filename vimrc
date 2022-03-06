@@ -27,6 +27,7 @@ Plugin 'kana/vim-operator-user' " Needed for clang-format
 Plugin 'tmsvg/pear-tree' " Pair completion
 Plugin 'mattn/emmet-vim' " Emmet (html expansion)
 Plugin 'glench/vim-jinja2-syntax' " jinja2 highlighting/indent
+Plugin 'andymass/vim-matchup' " better matching (html tags, etc)
 
 " Neovim specific plugins
 if has('nvim')

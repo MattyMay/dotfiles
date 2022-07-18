@@ -7,17 +7,38 @@
 
 - link:
     ~/.tmux.conf:
-    ~/.vimrc:
+      path: misc/tmux.conf
     ~/.bash_profile:
+      path: bash/bash_profile
     ~/.bashrc:
+      path: bash/bashrc
     ~/.bash_aliases:
+      path: bash/bash_aliases
     ~/.bash_prompt:
+      path: bash/bash_prompt
     ~/.inputrc:
-    ~/.ideavimrc:
+      path: bash/inputrc
+    ~/.vimrc:
+      path: vim/vimrc
     ~/.config/nvim/init.vim:
-    ~/.alacritty.yml:
+      path: vim/init.vim
     ~/.coc-vimrc:
+      path: vim/coc-vimrc
+    ~/.ideavimrc:
+      path: misc/ideavimrc
+    ~/.alacritty.yml:
+      path: misc/alacritty.yml
     ~/.config/utop/init.ml:
+      path: misc/init.ml
+    ~/.yabairc:
+      path: mac/yabairc
+      if: '[ `uname` = Darwin ]'
+    ~/skhdrc:
+      path: mac/skhdrc
+      if: '[ `uname` = Darwin ]'
+    ~/bin/popyabai.py:
+      path: mac/popyabai.py
+      if: '[ `uname` = Darwin ]'
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

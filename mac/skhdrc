@@ -1,0 +1,25 @@
+# focus spaces (auto destroy empty spaces)
+cmd + shift - j : ~/bin/popyabai.py space --focus next
+cmd + shift - k : ~/bin/popyabai.py space --focus prev
+
+# move windows between spaces
+ctrl + shift - j : ~/bin/popyabai.py window --space next
+ctrl + shift - k : ~/bin/popyabai.py window --space prev
+
+# focus windows
+cmd - l : yabai -m window --focus east
+cmd - k : yabai -m window --focus north
+cmd - j : yabai -m window --focus south
+cmd - h : yabai -m window --focus west
+
+# swap windows
+# cmd + return - l : yabai -m window --swap east
+# cmd + return - k : yabai -m window --swap north
+# cmd + return - j : yabai -m window --swap south
+# cmd + return - h : yabai -m window --swap west
+
+# Launch new Alacritty terminal
+cmd - t : /Applications/Alacritty.app/Contents/MacOS/alacritty
+
+# Launch new Firefox browser
+cmd - b : /Applications/Firefox.app/Contents/MacOS/firefox

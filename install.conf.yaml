@@ -33,7 +33,7 @@
     ~/.yabairc:
       path: mac/yabairc
       if: '[ `uname` = Darwin ]'
-    ~/skhdrc:
+    ~/.skhdrc:
       path: mac/skhdrc
       if: '[ `uname` = Darwin ]'
     ~/bin/popyabai.py:

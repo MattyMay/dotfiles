@@ -39,6 +39,9 @@
     ~/bin/popyabai.py:
       path: mac/popyabai.py
       if: '[ `uname` = Darwin ]'
+    ~/bin/git-auto-complete.bash:
+      path: mac/git-auto-complete.bash
+      if: '[ `uname` = Darwin ]'
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

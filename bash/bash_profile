@@ -27,6 +27,11 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
+# if git completion script exists, source it
+if [ -f "$HOME/git-auto-complete.bash" ] ; then
+    source "$HOME/bin/git-auto-complete.bash"
+fi
+
 # source cargo env
 . "$HOME/.cargo/env"
 

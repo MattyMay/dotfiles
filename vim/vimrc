@@ -28,6 +28,7 @@ Plugin 'tmsvg/pear-tree' " Pair completion
 Plugin 'mattn/emmet-vim' " Emmet (html expansion)
 Plugin 'glench/vim-jinja2-syntax' " jinja2 highlighting/indent
 Plugin 'andymass/vim-matchup' " better matching (html tags, etc)
+Plugin 'tpope/vim-fugitive' " git stuff
 
 " Neovim specific plugins
 if has('nvim')

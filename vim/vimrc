@@ -12,7 +12,6 @@ Plugin 'VundleVim/Vundle.vim'
 " colors, themes, etc
 " Plugin 'Yggdroot/indentLine' " Indent guide
 Plugin 'lukas-reineke/indent-blankline.nvim'
-Plugin 'joshdick/onedark.vim' " Onedark theme, use this for lightline
 
 
 " Helper functionality
@@ -31,12 +30,13 @@ Plugin 'tpope/vim-fugitive' " git stuff
 
 " Neovim specific plugins
 if has('nvim')
+    Plugin 'navarasu/onedark.nvim' " Onedark theme. Use for nvim
     Plugin 'nvim-lualine/lualine.nvim' " nvim fanvy status bar
     Plugin 'nvim-treesitter/nvim-treesitter' " Better highlighting
-    Plugin 'navarasu/onedark.nvim' " Different onedark theme, use this for editor
 
 " Vim specific plugins
 else
+    Plugin 'joshdick/onedark.vim' " Onedark theme, use this vim
     Plugin 'itchyny/lightline.vim' " fancy status bar
     Plugin 'sheerun/vim-polyglot' " Syntax highlighting
 

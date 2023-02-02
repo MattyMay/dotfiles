@@ -1,4 +1,9 @@
 {
-    "suggest.noselect": true,
-    "inlayHint.filetypes": []
+  "suggest.noselect": true,
+  "inlayHint.filetypes": [],
+  "clangd.arguments": [
+    "--query-driver=/usr/bin/g++",
+    "--background-index"
+  ],
+  "clangd.path": "~/.config/coc/extensions/coc-clangd-data/install/15.0.6/clangd_15.0.6/bin/clangd"
 }

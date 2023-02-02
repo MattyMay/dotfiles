@@ -8,6 +8,10 @@ alias la='ls -A'
 alias l='ls -lF'
 alias vim='nvim'
 alias python='python3'
+alias clip='xclip -sel clip'
+
+# docker clean ALL cache
+alias docker_clean_all='docker kill -f $(docker ps -q); docker rm -f $(docker ps --filter=status=exited --filter=status=created -q); docker rmi -f $(docker images -a -q);'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

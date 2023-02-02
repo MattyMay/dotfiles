@@ -92,3 +92,9 @@ mkcd () {
 
 # opam env
 eval $(opam env)
+
+# configure thefuck alias
+eval "$(thefuck --alias)"
+
+# default to latest lts release of Node
+nvm use --lts

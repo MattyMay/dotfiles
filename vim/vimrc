@@ -30,6 +30,7 @@ Plugin 'tpope/vim-fugitive' " git stuff
 
 " Neovim specific plugins
 if has('nvim')
+    Plugin 'folke/todo-comments.nvim' " highlight TODOs
     Plugin 'navarasu/onedark.nvim' " Onedark theme. Use for nvim
     Plugin 'nvim-lualine/lualine.nvim' " nvim fanvy status bar
     Plugin 'nvim-treesitter/nvim-treesitter' " Better highlighting

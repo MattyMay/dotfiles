@@ -10,7 +10,7 @@ if [ -f "~/.linuxify" ];  then
 fi
 
 # Editor
-export EDITOR=vim
+export EDITOR=nvim
 
 # Vim keybinds
 set -o vi
@@ -95,3 +95,6 @@ eval $(opam env)
 
 # configure thefuck alias
 eval "$(thefuck --alias)"
+
+# add dirs to PATH
+export PATH="/home/mattmayf/.cargo/bin:/home/mattmayf/bin:$PATH"

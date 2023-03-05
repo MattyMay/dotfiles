@@ -9,6 +9,9 @@ call vundle#begin()
 "let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
+" GH copilot
+Plugin 'github/copilot.vim'
+
 " colors, themes, etc
 " Plugin 'Yggdroot/indentLine' " Indent guide
 Plugin 'lukas-reineke/indent-blankline.nvim'

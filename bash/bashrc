@@ -97,4 +97,4 @@ eval $(opam env)
 eval "$(thefuck --alias)"
 
 # add dirs to PATH
-export PATH="/home/mattmayf/.cargo/bin:/home/mattmayf/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$HOME/bin:$PATH"

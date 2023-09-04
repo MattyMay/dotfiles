@@ -50,5 +50,9 @@
       path: mac/git-auto-complete.bash
       if: '[ `uname` = Darwin ]'
 
+    # task stuff
+    ~/.taskrc:
+      path: tasks/taskrc
+
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

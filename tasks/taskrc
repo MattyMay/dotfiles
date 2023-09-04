@@ -1,0 +1,27 @@
+# [Created by task 2.6.1 9/3/2023 15:06:24]
+# Taskwarrior program configuration file.
+# For more documentation, see https://taskwarrior.org or try 'man task', 'man task-color',
+# 'man task-sync' or 'man taskrc'
+
+# Here is an example of entries that use the default, override and blank values
+#   variable=foo   -- By specifying a value, this overrides the default
+#   variable=      -- By specifying no value, this means no default
+#   #variable=foo  -- By commenting out the line, or deleting it, this uses the default
+
+# You can also refence environment variables:
+#   variable=$HOME/task
+#   variable=$VALUE
+
+# Use the command 'task show' to see all defaults and overrides
+
+# Files
+data.location=$HOME/.task
+
+# Sync
+taskd.certificate=$HOME/.task/sync-auth/private.certificate.pem
+taskd.key=$HOME/.task/sync-auth/private.key.pem
+taskd.ca=$HOME/.task/sync-auth/ca.cert.pem
+taskd.server=inthe.am:53589
+taskd.credentials=inthe_am/mattmayf/30158d9e-91f7-41db-a721-b639e7237003
+taskd.trust=strict
+news.version=2.6.0

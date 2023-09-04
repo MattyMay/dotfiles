@@ -9,6 +9,7 @@ alias l='ls -lF'
 alias vim='nvim'
 alias python='python3'
 alias clip='xclip -sel clip'
+alias wiki='vim ~/vimwiki/index.md'
 
 # docker clean ALL cache
 alias docker_clean_all='docker kill -f $(docker ps -q); docker rm -f $(docker ps --filter=status=exited --filter=status=created -q); docker rmi -f $(docker images -a -q);'

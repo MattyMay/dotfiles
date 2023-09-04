@@ -31,6 +31,11 @@ Plugin 'glench/vim-jinja2-syntax' " jinja2 highlighting/indent
 Plugin 'andymass/vim-matchup' " better matching (html tags, etc)
 Plugin 'tpope/vim-fugitive' " git stuff
 
+" Wiki/tasks stuff
+Plugin 'vimwiki/vimwiki' " Wiki
+Plugin 'michal-h21/vimwiki-sync.git' " Sync wiki and tasks with GH
+Plugin 'tools-life/taskwiki'
+
 " Neovim specific plugins
 if has('nvim')
     Plugin 'folke/todo-comments.nvim' " highlight TODOs
@@ -67,6 +72,17 @@ else
       set termguicolors
     endif
 endif
+
+" ************** WIKI / TASKS **********************
+let g:vimwiki_list = [
+    \ {
+        \'path': '$HOME/vimwiki', 
+        \'syntax': 'markdown', 
+        \'ext': '.md', 
+        \'links_space_char': '_'
+    \ }
+\]
+let g:vimwiki_global_ext = 0
 
 " **************** PAIR COMPLETION ****************
 let g:pear_tree_repeatable_expand = 1

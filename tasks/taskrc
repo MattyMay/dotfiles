@@ -28,3 +28,8 @@ news.version=2.6.0
 
 # theme
 include /usr/share/taskwarrior/dark-gray-blue-256.theme
+
+# Inherited urgency for blocking tasks
+urgency.inherit=on
+urgency.blocked.coefficient=0.0
+urgency.blocking.coefficient=0.0

@@ -84,6 +84,14 @@ let g:vimwiki_list = [
 \]
 let g:vimwiki_global_ext = 0
 
+" add $U to viewport to sort by urgency
+let g:taskwiki_sort_orders={"U" : "urgency-"}
+
+" ************** COPILOT **************************
+" leader + tab to accept
+inoremap <silent><expr> <leader><tab> copilot#Accept("")
+let g:copilot_no_tab_map = 1
+
 " **************** PAIR COMPLETION ****************
 let g:pear_tree_repeatable_expand = 1
 let g:pear_tree_smart_openers = 0

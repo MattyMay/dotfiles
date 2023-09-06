@@ -18,13 +18,7 @@
 data.location=$HOME/.task
 
 # Sync
-taskd.certificate=$HOME/.task/sync-auth/private.certificate.pem
-taskd.key=$HOME/.task/sync-auth/private.key.pem
-taskd.ca=$HOME/.task/sync-auth/ca.cert.pem
-taskd.server=inthe.am:53589
-taskd.credentials=inthe_am/mattmayf/30158d9e-91f7-41db-a721-b639e7237003
-taskd.trust=strict
-news.version=2.6.0
+include $HOME/.task/sync-auth/config
 
 # theme
 include /usr/share/taskwarrior/dark-gray-blue-256.theme

@@ -87,6 +87,9 @@ let g:vimwiki_global_ext = 0
 " add $U to viewport to sort by urgency
 let g:taskwiki_sort_orders={"U" : "urgency-"}
 
+" Turn off autosave
+let g:vimwiki_autowriteall = 0
+
 " ************** COPILOT **************************
 " leader + tab to accept
 inoremap <silent><expr> <leader><tab> copilot#Accept("")

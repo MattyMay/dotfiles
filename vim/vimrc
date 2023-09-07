@@ -81,11 +81,14 @@ let g:vimwiki_list = [
         \'ext': '.md', 
         \'links_space_char': '_'
     \ }
-\]
+\ ]
 let g:vimwiki_global_ext = 0
 
-" add $U to viewport to sort by urgency
-let g:taskwiki_sort_orders={"U" : "urgency-"}
+" Custom sort orders
+let g:taskwiki_sort_orders={
+    \ "U" : "urgency-",
+    \ "D" : "due+"
+\ }
 
 " Turn off autosave
 let g:vimwiki_autowriteall = 0

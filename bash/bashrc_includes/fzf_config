@@ -12,31 +12,33 @@
 # in the current working directory. They all also take an optional -H flag to
 # include hidden files in the search space, as our fzf behavior is
 # configured to ignore hidden files and .gitignored files by default.
-#   - fzf_from_dir [-H] [dir]
-#       Search for a file print the selected file to stdout.
-#       With no arguments, this is essentially equivalent to `fzf`.
-#       Aliases:
-#         - f [dir]: fzf_from_dir [dir]
-#         - fa [dir]: fzf_from_dir -H [dir]
-#             
-#   - fzf_edit_from_dir [-H] [dir]
-#       Search for a file open the selected file in $EDITOR.
-#       With no arguments, this is essentially equivalent to `$EDITOR $(fzf)`
-#       except that it shows a preview of the file in the fzf window.
-#       Aliases:
-#         - fe [dir]: fzf_edit_from_dir [dir]
-#         - fea [dir]: fzf_edit_from_dir -H [dir]
-#   - fzf_cd_from_dir [-H] [dir]
-#       Search for a directory and cd to the selected directory.
-#       Aliases:
-#         - fcd [dir]: fzf_cd_from_dir [dir]
-#         - fcda [dir]: fzf_cd_from_dir -H [dir]
+# - fzf_from_dir [-H] [dir]
+#     Search for a file print the selected file to stdout.
+#     With no arguments, this is essentially equivalent to `fzf`.
+#     Aliases:
+#       - f [dir]: fzf_from_dir [dir]
+#       - fa [dir]: fzf_from_dir -H [dir]
+#           
+# - fzf_edit_from_dir [-H] [dir]
+#     Search for a file open the selected file in $EDITOR.
+#     With no arguments, this is essentially equivalent to `$EDITOR $(fzf)`
+#     except that it shows a preview of the file in the fzf window.
+#     Aliases:
+#       - fe [dir]: fzf_edit_from_dir [dir]
+#       - fea [dir]: fzf_edit_from_dir -H [dir]
+# - fzf_cd_from_dir [-H] [dir]
+#     Search for a directory and cd to the selected directory.
+#     Aliases:
+#       - fcd [dir]: fzf_cd_from_dir [dir]
+#       - fcda [dir]: fzf_cd_from_dir -H [dir]
 #
 # The `fzf_git_log` command is a wrapper around `git log` that uses fzf to allow
 # fuzzy searching of the git log. It takes the same arguments as `git log`.
 #  - fzf_git_log [args]
 #       Search the git log with fzf. Displays a preview of the commit in the
-#       fzf window and displays the logs in tree format.
+#       fzf window and displays the logs in tree format. Relies on an git alias
+#       `ll`. To create the alias, run:
+#         git config --global alias.ll "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 #       Aliases:
 #         - fgl [args]: fzf_git_log [args]
 #

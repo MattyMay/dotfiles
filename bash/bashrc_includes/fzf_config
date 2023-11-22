@@ -1,0 +1,177 @@
+#!/bin/bash
+##############
+# Fzf config and functions. Functions under COMMANDS are fzf wrappers with
+# aliases. Aliases that end in `a` include hidden files in the search space.
+# Provided command aliases are:
+#  f [dir]
+#    Find a file in dir with fzf and echo it. If dir is not provided, search
+#    from cwd.
+#  fa [dir]
+#    Find a file in dir with fzf and echo it. If dir is not provided, search
+#    from cwd. Include hidden files in search space.
+#  fe [dir]
+#    Find a file in dir with fzf and open it in $EDITOR. If dir is not provided,
+#    search from cwd.
+#  fea [dir]
+#    Find a file in dir with fzf and open it in $EDITOR. If dir is not provided,
+#    search from cwd. Include hidden files in search space.
+#  fcd [dir]
+#    Find a directory in dir with fzf and cd to it. If dir is not provided,
+#    search from cwd.
+#  fcda [dir]
+#    Find a directory in dir with fzf and cd to it. If dir is not provided,
+#    search from cwd. Include hidden directories in search space.
+#
+# Depending on how fzf was installed, you may need to edit the BASIC CONFIG
+# section to enable fzf keybinds and fuzzy completion.
+# 
+# Much of this is adapted from Dennis B's blog post: 
+#     https://bluz71.github.io/2018/11/26/fuzzy-finding-in-bash-with-fzf.html
+
+############## DEPENDENCY CHECKS ##############
+# if fzf is not installed, print a warning and return
+if ! command -v fzf &> /dev/null && [ ! -f ~/.fzf.bash ]; then
+    echo "fzf not installed. Install fzf to use fzf_config"
+    return
+fi
+
+# # if fd is not installed, print a warning and return
+if ! command -v fd &> /dev/null; then
+    echo "fd not installed. Install fd to use fzf_config"
+    return
+fi
+
+############## BASIC CONFIG ###################
+# enable fzf keybinds
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# use fd because it's faster and ignores .gitignored files
+export FZF_DEFAULT_COMMAND='fd --type f --color=never'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d . --color=never'
+
+############## HELPER FUNCTIONS ###############
+
+# Echo the path provided or cwd if no path is provided. Exit with error if
+# provided path is not a directory.
+cwd_or_dir() {
+    # if $1 is not provided, echo cwd
+    if [[ "$1" == "" ]]
+    then
+        echo .
+    # if $1 is provided but is not a directory, exit with error
+    elif [[ ! -d $1 ]]
+    then
+        echo "$1 is not a directory" >&2
+        return 1
+    # if $1 is provided and is a directory, echo it
+    else
+        echo $1
+    fi
+}
+
+# echo a command to print the first 500 lines of a file. If batcat is
+# installed, use it to print the file, otherwise use head
+get_preview_command() {
+    if command -v batcat &> /dev/null; then
+        echo "batcat --color=always --line-range :500 {}"
+    else
+        echo "head -n 500 {}"
+    fi
+}
+
+# echo a header string for fzf.
+# usage: get_header parent_dir [command]
+get_header() {
+    local parent_dir=$(realpath $1)
+    local command=$2
+
+    local header=""
+    if [[ -n $command ]]; then
+        header="$command"
+    fi
+    header="$header: searching in $parent_dir/"
+    echo $header
+}
+
+############## FZF COMMANDS ###################
+# Run fzf on a list of files from $1 if provided, otherwise from cwd
+fzf_from_dir() {
+    local dir
+    dir=$(cwd_or_dir $1) || return 1
+    fd . $dir | fzf --header="$(get_header $dir)"
+}
+alias f="fzf_from_dir"
+
+# Run fzf on a list of files including hidden files from $1 if provided,
+# otherwise from cwd
+fzf_hidden_from_dir() {
+    local dir
+    dir=$(cwd_or_dir $1) || return 1
+    fd . $dir --hidden | fzf --header="$(get_header $dir)"
+}
+alias fa="fzf_hidden_from_dir"
+
+# find a file to edit from $1 if provided, otherwise from cwd
+fzf_edit_from_dir() {
+    local dir
+    dir=$(cwd_or_dir $1) || return 1
+    local preview=$(get_preview_command)
+    local file=$(fd . $dir | fzf \
+        --preview="$preview" \
+        --header="$(get_header $dir 'edit')"
+    )
+    if [[ "$file" != "" ]]; then
+        $EDITOR "$file"
+    fi
+}
+alias fe="fzf_edit_from_dir"
+
+# find a file to edit including hidden files from $1 if provided, otherwise
+# from cwd
+fzf_edit_hidden_from_dir() {
+    local dir
+    dir=$(cwd_or_dir $1) || return 1
+    local preview=$(get_preview_command)
+    local file=$(fd . $dir --hidden | fzf \
+        --preview="$preview" \
+        --header="$(get_header $dir 'edit')"
+    )
+    if [[ "$file" != "" ]]; then
+        $EDITOR "$file"
+    fi
+}
+alias fea="fzf_edit_hidden_from_dir"
+
+# find a directory to cd to from $1 if provided, otherwise from cwd
+fzf_cd_from_dir() {
+    local from_dir
+    from_dir=$(cwd_or_dir $1) || return 1
+    local dir=$(fd . $from_dir --type d | \
+        fzf \
+            --preview="tree -C {} | head -n 100" \
+            --header="$(get_header $from_dir 'cd')" \
+            --no-multi
+    )
+    if [[ "$dir" != "" ]]; then
+        cd "$dir"
+    fi
+}
+alias fcd="fzf_cd_from_dir"
+
+# find a directory to cd to including hidden directories from $1 if provided,
+# otherwise from cwd
+fzf_cd_hidden_from_dir() {
+    local from_dir
+    from_dir=$(cwd_or_dir $1) || return 1
+    local dir=$(fd . $from_dir --type d --hidden | \
+        fzf \
+            --preview="tree -C {} | head -n 100" \
+            --header="$(get_header $from_dir 'cd')" \
+            --no-multi
+    )
+    if [[ "$dir" != "" ]]; then
+        cd "$dir"
+    fi
+}
+alias fcda="fzf_cd_hidden_from_dir"

@@ -4,6 +4,8 @@ case $- in
       *) return;;
 esac
 
+DOTFILES_DIR="$HOME/dotfiles"
+
 # if linuxify script exists (for Mac), run it
 if [ -f "~/.linuxify" ];  then
     source ~/.linuxify
@@ -44,11 +46,6 @@ esac
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# Aliases
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
-
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
@@ -63,9 +60,6 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# Prompt
-. ~/.bash_prompt
 
 # First login will start ssh-agent. Every shell after will share it.
 if [ ! -S ~/.ssh/ssh_auth_sock ]; then
@@ -98,3 +92,10 @@ eval "$(thefuck --alias)"
 
 # add dirs to PATH
 export PATH="$HOME/.cargo/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+### configure fzf ###
+
+# source all bashrc includes
+for FILE in $DOTFILES_DIR/bash/bashrc_includes/*; do
+    source $FILE
+done

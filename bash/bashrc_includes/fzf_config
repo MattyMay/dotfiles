@@ -64,17 +64,18 @@ fi
 ############## BASIC CONFIG ###################
 # enable fzf keybinds
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+FZF_HEIGHT_PERCENT=60
 
 # use fd because it's faster and ignores .gitignored files
 export FZF_DEFAULT_COMMAND='fd --type f --color=never'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d . --color=never'
-export FZF_DEFAULT_OPTS='
-    --height 60%
+export FZF_DEFAULT_OPTS="
+    --height $FZF_HEIGHT_PERCENT%
     --reverse
     --multi
-    --bind ctrl-b:page-up,ctrl-f:page-down
-'
+    --bind ctrl-b:page-up,ctrl-f:page-down,ctrl-m:toggle-preview
+"
 
 ############## HELPER FUNCTIONS ###############
 
@@ -96,14 +97,41 @@ cwd_or_dir() {
     fi
 }
 
-# echo a command to print the first 500 lines of a file. If bat is
-# installed, use it to print the file, otherwise use head
-get_preview_command() {
+# echos a preview command that can be used with fzf. The preview command will:
+# - if selected file is a directory, print a tree of the directory
+# - if selected file is not a directory, print the first 500 lines of a file.
+#   If bat is installed, use it to print the file, otherwise use head.
+get_preview() {
+    local file_command
     if command -v bat &> /dev/null; then
-        echo "bat --color=always --line-range :500 {}"
+        file_command="bat --color=always --line-range :500 {}"
     else
-        echo "head -n 500 {}"
+        file_command="head -n 500 {}"
     fi
+    local dir_command="tree -C {} | head -n 100"
+    echo "if [ -d {} ]; then $dir_command; else $file_command; fi"
+}
+
+# echo a preview window string for fzf based on the size of the terminal.
+get_preview_window() {
+    local command=$1
+    local rows cols
+    read rows cols < <(stty size)
+
+    # calculate actual rows based on fzf height
+    rows=$(($rows * $FZF_HEIGHT_PERCENT / 100))
+
+    local preview_window="hidden"
+    if [[ $rows -ge 20 ]]; then
+        preview_window="down,50%,~0,+3"
+    elif [[ $cols -ge 90 ]]; then
+        if [[ $rows -lt 50 ]]; then
+            preview_window="right,50%,~0,+3"
+        else
+            preview_window="right,50%"
+        fi
+    fi
+    echo $preview_window
 }
 
 # echo a header string for fzf.
@@ -126,6 +154,7 @@ get_header() {
 # options:
 #   -H: include hidden files in search space
 fzf_from_dir() {
+    position_preview_command "fzf --preview='$(get_preview_command)'"
     usage() {
         echo "usage: fzf_from_dir [-H] [dir]"
     }
@@ -176,12 +205,12 @@ fzf_edit_from_dir() {
     done
     shift $((OPTIND -1))
 
-
     local dir
     dir=$(cwd_or_dir $1) || return 1
-    local preview=$(get_preview_command)
+
     local file=$(fd . $dir --type f $hidden_opt | fzf \
-        --preview="$preview" \
+        --preview="$(get_preview)" \
+        --preview-window="$(get_preview_window)" \
         --header="$(get_header $dir 'edit')"
     )
     if [[ "$file" != "" ]]; then
@@ -219,7 +248,7 @@ fzf_cd_from_dir() {
     from_dir=$(cwd_or_dir $1) || return 1
     local dir=$(fd . $from_dir --type d $hidden_opt | \
         fzf \
-            --preview="tree -C {} | head -n 100" \
+            --preview="$(get_preview)" \
             --header="$(get_header $from_dir 'cd')" \
             --no-multi
     )

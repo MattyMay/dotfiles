@@ -86,11 +86,11 @@ get_header() {
     local parent_dir=$(realpath $1)
     local command=$2
 
-    local header=""
+    local header
     if [[ -n $command ]]; then
-        header="$command"
+        header=$command": "
     fi
-    header="$header: searching in $parent_dir/"
+    header=$header"searching in "$parent_dir"/"
     echo $header
 }
 

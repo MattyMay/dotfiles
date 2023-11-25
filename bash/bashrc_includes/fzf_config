@@ -74,7 +74,7 @@ export FZF_DEFAULT_OPTS="
     --height $FZF_HEIGHT_PERCENT%
     --reverse
     --multi
-    --bind ctrl-b:page-up,ctrl-f:page-down,ctrl-m:toggle-preview
+    --bind ctrl-b:page-up,ctrl-f:page-down,ctrl-u:half-page-up,ctrl-d:half-page-down,ctrl-o:toggle-preview
 "
 
 ############## HELPER FUNCTIONS ###############
@@ -154,7 +154,6 @@ get_header() {
 # options:
 #   -H: include hidden files in search space
 fzf_from_dir() {
-    position_preview_command "fzf --preview='$(get_preview_command)'"
     usage() {
         echo "usage: fzf_from_dir [-H] [dir]"
     }
@@ -208,9 +207,12 @@ fzf_edit_from_dir() {
     local dir
     dir=$(cwd_or_dir $1) || return 1
 
+    local preview_window=$(get_preview_window)
+    local preview=$(get_preview)
+
     local file=$(fd . $dir --type f $hidden_opt | fzf \
-        --preview="$(get_preview)" \
-        --preview-window="$(get_preview_window)" \
+        --preview="$preview" \
+        --preview-window="$preview_window" \
         --header="$(get_header $dir 'edit')"
     )
     if [[ "$file" != "" ]]; then
@@ -246,10 +248,14 @@ fzf_cd_from_dir() {
 
     local from_dir
     from_dir=$(cwd_or_dir $1) || return 1
+
+    local preview_window=$(get_preview_window)
+    local preview=$(get_preview)
+
     local dir=$(fd . $from_dir --type d $hidden_opt | \
         fzf \
-            --preview="$(get_preview)" \
-            --header="$(get_header $from_dir 'cd')" \
+            --preview="$preview" \
+            --preview-window="$preview_window" \
             --no-multi
     )
     if [[ "$dir" != "" ]]; then

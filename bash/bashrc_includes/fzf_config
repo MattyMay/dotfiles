@@ -112,11 +112,11 @@ get_preview() {
     echo "if [ -d {} ]; then $dir_command; else $file_command; fi"
 }
 
-# echo a preview window string for fzf based on the size of the terminal.
+# echo a preview window string for fzf based on the size of the stderr terminal.
 get_preview_window() {
     local command=$1
     local rows cols
-    read rows cols < <(stty size)
+    read rows cols < <(stty -F /dev/stderr size)
 
     # calculate actual rows based on fzf height
     rows=$(($rows * $FZF_HEIGHT_PERCENT / 100))
@@ -149,6 +149,8 @@ get_header() {
 }
 
 ############## FZF COMMANDS ###################
+alias fp="fzf --preview='$(get_preview)' --preview-window='$(get_preview_window)'"
+
 # fzf_from_dir [-H] [dir]
 # Run fzf on a list of files from $1 if provided, otherwise from cwd.
 # options:

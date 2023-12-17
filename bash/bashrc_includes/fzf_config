@@ -283,4 +283,4 @@ fzf_git_log() {
         git show $commit
     fi
 }
-alias gll='fzf_git_log'
+alias fgl='fzf_git_log'

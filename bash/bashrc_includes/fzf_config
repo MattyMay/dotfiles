@@ -62,20 +62,25 @@ if ! command -v fd &> /dev/null; then
 fi
 
 ############## BASIC CONFIG ###################
-# enable fzf keybinds
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 FZF_HEIGHT_PERCENT=60
+
+# disable ALT-C command because it conflicts with vim commands in bash
+export FZF_ALT_C_COMMAND=''
 
 # use fd because it's faster and ignores .gitignored files
 export FZF_DEFAULT_COMMAND='fd --type f --color=never'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND='fd --type d . --color=never'
+# export FZF_ALT_C_COMMAND='fd --type d . --color=never'
 export FZF_DEFAULT_OPTS="
     --height $FZF_HEIGHT_PERCENT%
     --reverse
     --multi
     --bind ctrl-b:page-up,ctrl-f:page-down,ctrl-u:half-page-up,ctrl-d:half-page-down,ctrl-o:toggle-preview
 "
+
+# enable fzf keybinds
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 
 ############## HELPER FUNCTIONS ###############
 

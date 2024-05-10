@@ -10,6 +10,11 @@ let g:indent_blankline_show_current_context = v:true
 
 """""""""" TREE SITTER STUFF
 lua <<EOF
+require("ibl").setup {
+    indent = {char = "│", tab_char="│"},
+    scope = {show_start = false, show_end = false},
+}
+
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   highlight = {

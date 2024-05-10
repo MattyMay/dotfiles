@@ -22,7 +22,7 @@ require'nvim-treesitter.configs'.setup {
 require('lualine').setup {
   options = {
     icons_enabled = false,
-    theme = 'onedark',
+    theme = 'tokyonight',
     section_separators = '',
     component_separators = '',
     disabled_filetypes = {

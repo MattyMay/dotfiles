@@ -12,7 +12,6 @@ Plugin 'VundleVim/Vundle.vim'
 " GH copilot
 Plugin 'github/copilot.vim'
 
-" colors, themes, etc
 " Plugin 'Yggdroot/indentLine' " Indent guide
 Plugin 'lukas-reineke/indent-blankline.nvim'
 
@@ -41,7 +40,8 @@ Plugin 'tools-life/taskwiki'
 " Neovim specific plugins
 if has('nvim')
     Plugin 'folke/todo-comments.nvim' " highlight TODOs
-    Plugin 'navarasu/onedark.nvim' " Onedark theme. Use for nvim
+    " Plugin 'navarasu/onedark.nvim' " Onedark theme. Use for nvim
+    Plugin 'folke/tokyonight.nvim' " Tokyo night theme
     Plugin 'nvim-lualine/lualine.nvim' " nvim fanvy status bar
     Plugin 'nvim-treesitter/nvim-treesitter' " Better highlighting
 
@@ -117,7 +117,7 @@ let g:clang_format#style_options = {
 source ~/.coc-vimrc
 
 " ************** COLOR, SYNTAX ********************
-colorscheme onedark
+colorscheme tokyonight-moon
 syntax on
 highlight Comment cterm=italic gui=italic
 set colorcolumn=80

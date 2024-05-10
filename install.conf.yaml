@@ -32,9 +32,13 @@
     ~/.vim/after/ftplugin/vimwiki.vim:
       path: vim/vimwiki.vim
 
+    # Alacritty stuff
+    ~/.config/alacritty/alacritty.toml:
+      path: alacritty/alacritty.toml
+    ~/.config/alacritty/theme.toml:
+      path: alacritty/tokyonight_moon.toml
+
     # misc stuff
-    ~/.alacritty.yml:
-      path: misc/alacritty.yml
     ~/.config/utop/init.ml:
       path: misc/init.ml
     ~/.yabairc:

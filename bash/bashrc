@@ -98,3 +98,8 @@ export PATH="$HOME/.cargo/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 for FILE in $DOTFILES_DIR/bash/bashrc_includes/*; do
     source $FILE
 done
+
+# if tmux installed and not already running, start a new tmux session
+if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+  exec tmux
+fi

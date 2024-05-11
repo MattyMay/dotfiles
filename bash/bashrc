@@ -98,14 +98,3 @@ export PATH="$HOME/.cargo/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 for FILE in $DOTFILES_DIR/bash/bashrc_includes/*; do
     source $FILE
 done
-
-# if tmux installed and not already running, start a new tmux session
-if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-    # if session(s) exist, attach to latest and open tree view
-    if [ $(tmux ls | wc -l) -ge 1 ]; then
-        exec tmux a\; choose-tree -wZ
-    # otherwise start a new session
-    else
-        exec tmux
-    fi
-fi

@@ -1,0 +1,30 @@
+#!/bin/bash
+# Bash specific tmux behavior
+
+# Automatically start tmux session when logging in remotely
+if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then
+    # if session(s) exist, attach to latest and open tree view
+    if [ $(tmux ls | wc -l) -ge 1 ]; then
+        \tmux a\; choose-tree -wZ
+    # otherwise start a new session
+    else
+        \tmux new-session -s ssh_tmux
+    fi
+fi
+
+# Default to attaching to an existing session when starting tmux if one exists
+function tmux_choose_tree() {
+    # if tmux installed and not already running, start a new tmux session
+    if command -v tmux &> /dev/null && [ -n "$PS1" ] && \
+        [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && \
+        [ -z "$TMUX" ]; then
+        # if session(s) exist, attach to latest and open tree view
+        if [ $(\tmux ls | wc -l) -ge 1 ]; then
+            \tmux a\; choose-tree -wZ
+        # otherwise start a new session
+        else
+            \tmux a
+        fi
+    fi
+}
+alias tmux='tmux_choose_tree'

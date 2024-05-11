@@ -103,7 +103,7 @@ done
 if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
     # if session(s) exist, attach to latest and open tree view
     if [ $(tmux ls | wc -l) -ge 1 ]; then
-        exec tmux a\; choose-tree
+        exec tmux a\; choose-tree -wZ
     # otherwise start a new session
     else
         exec tmux

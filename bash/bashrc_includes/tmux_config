@@ -23,7 +23,7 @@ function tmux_choose_tree() {
             \tmux a\; choose-tree -wZ
         # otherwise start a new session
         else
-            \tmux a
+            \tmux
         fi
     fi
 }

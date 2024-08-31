@@ -98,3 +98,9 @@ export PATH="$HOME/.cargo/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 for FILE in $DOTFILES_DIR/bash/bashrc_includes/*; do
     source $FILE
 done
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+source "/etc/profile.d/rvm.sh"
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"

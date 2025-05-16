@@ -27,3 +27,4 @@ include /usr/share/taskwarrior/dark-gray-blue-256.theme
 urgency.inherit=on
 urgency.blocked.coefficient=0.0
 urgency.blocking.coefficient=0.0
+news.version=3.1.0

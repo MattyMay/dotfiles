@@ -21,7 +21,6 @@ Plugin 'neoclide/coc.nvim' " Auto complete / LSP
 Plugin 'christoomey/vim-tmux-navigator' " Seamless vim/tmux pane navigation
 Plugin 'tpope/vim-commentary' " Comments - use 'gcc' for line, 'gc' in visual or to comment out a target of a command
 Plugin 'preservim/nerdtree' " Tree file explorer
-Plugin 'ctrlpvim/ctrlp.vim' " Fuzzy file finder
 Plugin 'rhysd/vim-clang-format' " Clang-format
 Plugin 'kana/vim-operator-user' " Needed for clang-format
 Plugin 'tmsvg/pear-tree' " Pair completion

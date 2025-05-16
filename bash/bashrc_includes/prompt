@@ -1,65 +1,72 @@
 #!/bin/bash
-# Colors
-RESET=$(tput sgr0)
-BOLD=$(tput bold)
-BLUE=$(tput setaf 4)
-GREY=$(tput setaf 244)
-RED=$(tput setaf 1)
-YELLOW=$(tput setaf 3)
 
-# echos branch name if in a repo, and returns length of branch name str
+# ANSI color codes (no need for \[ \] here)
+RESET='\033[0m'
+BOLD='\033[1m'
+BLUE='\033[34m'
+GREY='\033[38;5;244m'
+RED='\033[31m'
+YELLOW='\033[33m'
+
+# Git branch
 __git_branch() {
-  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
-  if [ ! -z $BRANCH ]; then
-    echo -n "$BRANCH"
-    return ${#BRANCH}
+  local branch
+  branch=$(git symbolic-ref --short -q HEAD 2>/dev/null)
+  [ -n "$branch" ] && echo -n "$branch"
+}
+
+# Git status
+__git_status() {
+  git rev-parse --is-inside-work-tree &>/dev/null || return
+
+  local status=""
+  if ! git symbolic-ref -q HEAD > /dev/null; then
+    status+=" 🔀"
+  elif [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+    status+=" ✗"
   fi
-  return 0
+
+  echo -n "$status"
 }
 
-# returns len of git branch string
-__git_branch_len() {
-  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
-  if [ ! -z $BRANCH ]; then
-    return ${#BRANCH}
+# Show SSH host
+__host_prefix() {
+  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    echo -n "$USER@$(hostname):"
   fi
-  return 0
 }
 
-# echos ✗ if not clean
-__git_changes() {
-  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
-    if [ ! -z $BRANCH ]; then
-      if [ ! -z "$(git status --short)" ]; then
-        echo " ✗"
-      fi
-    fi
+# Build prompt
+__prompt() {
+  local host="$(__host_prefix)"
+  local path=$(dirs +0)
+
+  local branch="$(__git_branch)"
+  local status="$(__git_status)"
+
+  # Combine lengths
+  local host_len=${#host}
+  local path_len=${#path}
+  local branch_len=${#branch}
+  local status_len=${#status}
+  local total_len=$((host_len + path_len + branch_len + status_len))
+
+  local limit=40
+  local newline=""
+  local path_prefix=""
+  local git_prefix=" "
+  if (( total_len > limit )); then
+    newline="\n"
+    path_prefix="→ "
+  local git_prefix="  "
+  fi
+
+  echo -e "${path_prefix}${host}${BLUE}${BOLD}${path}${RESET}${newline}"\
+"${YELLOW}${git_prefix}${branch}${RESET}"\
+"${RED}$(echo "$status" | grep ✗)${RESET}"\
+"${YELLOW}$(echo "$status" | grep 🔀)${RESET}"\
+"${GREY} >>> ${RESET}"
 }
 
-# set host if remote
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    host="$USER@"`hostname`":"
-fi
-
-# limit length of path + git branch in prompt
-# arg1 should be '/w', arg2 should be max prompt length
-function __shortpath {
-    __git_branch_len
-    len_git=$?
-    len_prompt=${#1}
-    len_host=${#host}
-    total_len=$((len_prompt+len_git+len_host))
-    if [[ $total_len -gt $2 ]]; then
-        len=$2+3+$len_git+$len_host
-        echo "..."${1: -$len}
-    else
-        echo $1
-    fi
-}
-
-PS1="${host}"
-PS1+="\[$BLUE$BOLD\]\$(__shortpath '\w' 40)" # working directory
-PS1+="\[$YELLOW\]\$(__git_branch)" # git branch
-PS1+="\[$RED\]\$(__git_changes)" # x if not clean
-PS1+="\[$GREY\] >>> " # prompt
-PS1+="\[$RESET\]" # reset colors
+# Set prompt
+PS1='$(__prompt)'

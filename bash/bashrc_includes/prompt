@@ -54,11 +54,19 @@ __prompt() {
   local limit=40
   local newline=""
   local path_prefix=""
-  local git_prefix=" "
+  local git_prefix=""
+
+  if [ -n "$branch" ]; then
+    git_prefix=" "
+  fi
+
   if (( total_len > limit )); then
     newline="\n"
     path_prefix="→ "
-  local git_prefix="  "
+
+    if [ -n "$branch" ]; then
+      git_prefix="  "
+    fi
   fi
 
   echo -e "${path_prefix}${host}${BLUE}${BOLD}${path}${RESET}${newline}"\

@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# ANSI color codes (no need for \[ \] here)
-RESET='\033[0m'
-BOLD='\033[1m'
-BLUE='\033[34m'
-GREY='\033[38;5;244m'
-RED='\033[31m'
-YELLOW='\033[33m'
+# ANSI color codes
+RESET='\[\033[0m\]'
+BOLD='\[\033[1m\]'
+BLUE='\[\033[34m\]'
+GREY='\[\033[38;5;244m\]'
+RED='\[\033[31m\]'
+YELLOW='\[\033[33m\]'
 
 # Git branch
 __git_branch() {
   local branch
   branch=$(git symbolic-ref --short -q HEAD 2>/dev/null)
-  [ -n "$branch" ] && echo -n "$branch"
+  [ -n "$branch" ] && printf "$branch"
 }
 
 # Git status
@@ -26,19 +26,26 @@ __git_status() {
     status+=" ✗"
   fi
 
-  echo -n "$status"
+  printf "$status"
 }
 
 # Show SSH host
 __host_prefix() {
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    echo -n "$USER@$(hostname):"
+    printf "$USER@$(hostname):"
+  fi
+}
+
+__venv_prefix() {
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    printf "($(basename "$VIRTUAL_ENV")) "
   fi
 }
 
 # Build prompt
 __prompt() {
   local host="$(__host_prefix)"
+  local venv="$(__venv_prefix)"
   local path=$(dirs +0)
 
   local branch="$(__git_branch)"
@@ -55,6 +62,7 @@ __prompt() {
   local newline=""
   local path_prefix=""
   local git_prefix=""
+  local second_line_prefix=""
 
   if [ -n "$branch" ]; then
     git_prefix=" "
@@ -63,18 +71,23 @@ __prompt() {
   if (( total_len > limit )); then
     newline="\n"
     path_prefix="→ "
-
-    if [ -n "$branch" ]; then
-      git_prefix="  "
-    fi
   fi
 
-  echo -e "${path_prefix}${host}${BLUE}${BOLD}${path}${RESET}${newline}"\
-"${YELLOW}${git_prefix}${branch}${RESET}"\
+  if [ -n "$venv" ]; then
+      path_prefix=$venv
+  fi
+
+  if (( total_len > limit )); then
+    len=${#path_prefix}
+    second_line_prefix=$(printf '%*s' "$len" '')
+  fi
+
+  printf "${path_prefix}${host}${BLUE}${BOLD}${path}${RESET}${newline}"\
+"${YELLOW}${second_line_prefix}${git_prefix}${branch}${RESET}"\
 "${RED}$(echo "$status" | grep ✗)${RESET}"\
 "${YELLOW}$(echo "$status" | grep 🔀)${RESET}"\
 "${GREY} >>> ${RESET}"
 }
 
 # Set prompt
-PS1='$(__prompt)'
+PROMPT_COMMAND='PS1="$(__prompt)"'

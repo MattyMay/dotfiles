@@ -1,199 +1,89 @@
-" ************** VUNDLE STUFF ********************
-set nocompatible              " be iMproved, required
-filetype off                  " required
+" **************** BASIC SETTINGS ******************
+set nocompatible              " Disable Vi compatibility
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-
-"let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-" GH copilot
-Plugin 'github/copilot.vim'
-
-" Plugin 'Yggdroot/indentLine' " Indent guide
-Plugin 'lukas-reineke/indent-blankline.nvim'
-
-
-" Helper functionality
-Plugin 'neoclide/coc.nvim' " Auto complete / LSP
-Plugin 'christoomey/vim-tmux-navigator' " Seamless vim/tmux pane navigation
-Plugin 'tpope/vim-commentary' " Comments - use 'gcc' for line, 'gc' in visual or to comment out a target of a command
-Plugin 'preservim/nerdtree' " Tree file explorer
-Plugin 'rhysd/vim-clang-format' " Clang-format
-Plugin 'kana/vim-operator-user' " Needed for clang-format
-Plugin 'tmsvg/pear-tree' " Pair completion
-Plugin 'mattn/emmet-vim' " Emmet (html expansion)
-Plugin 'glench/vim-jinja2-syntax' " jinja2 highlighting/indent
-Plugin 'andymass/vim-matchup' " better matching (html tags, etc)
-Plugin 'tpope/vim-fugitive' " git stuff
-Plugin 'junegunn/fzf' " fuzzy finder
-Plugin 'junegunn/fzf.vim' " fuzzy finder commands
-
-" Wiki/tasks stuff
-Plugin 'vimwiki/vimwiki' " Wiki
-Plugin 'michal-h21/vimwiki-sync.git' " Sync wiki and tasks with GH
-Plugin 'tools-life/taskwiki'
-
-" Neovim specific plugins
-if has('nvim')
-    Plugin 'folke/todo-comments.nvim' " highlight TODOs
-    " Plugin 'navarasu/onedark.nvim' " Onedark theme. Use for nvim
-    Plugin 'folke/tokyonight.nvim' " Tokyo night theme
-    Plugin 'nvim-lualine/lualine.nvim' " nvim fanvy status bar
-    Plugin 'nvim-treesitter/nvim-treesitter' " Better highlighting
-
-" Vim specific plugins
-else
-    Plugin 'joshdick/onedark.vim' " Onedark theme, use this vim
-    Plugin 'itchyny/lightline.vim' " fancy status bar
-    Plugin 'sheerun/vim-polyglot' " Syntax highlighting
-
-endif
-
-call vundle#end()            " required
-filetype plugin indent on    " required
-
-" **************** VIM / NVIM *********************
-" Neovim specific settings
-if has('nvim')
-    set noshowcmd noruler " can slow things down in nvim
-
-else
-    " C-style language auto-complete
-    let g:ycm_clangd_binary_path = "usr/bin/clangd"
-    " lightline for regular vim
-    let g:lightline = {
-      \ 'colorscheme': 'onedark',
-      \ }
-    if exists('+termguicolors') " fix weird colors in tmux
-      let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-      let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-      set termguicolors
-    endif
-endif
-
-" ************** WIKI / TASKS **********************
-let g:vimwiki_list = [
-    \ {
-        \'path': '$HOME/vimwiki', 
-        \'syntax': 'markdown', 
-        \'ext': '.md', 
-        \'links_space_char': '_'
-    \ }
-\ ]
-let g:vimwiki_global_ext = 0
-let g:vimwiki_dir_link = 'index'
-
-" Custom sort orders
-let g:taskwiki_sort_orders={
-    \ "U" : "urgency-",
-    \ "D" : "due+"
-\ }
-
-" Turn off autosave
-let g:vimwiki_autowriteall = 0
-
-" ************** COPILOT **************************
-" leader + tab to accept
-inoremap <silent><expr> <leader><tab> copilot#Accept("")
-let g:copilot_no_tab_map = 1
-
-" **************** PAIR COMPLETION ****************
-let g:pear_tree_repeatable_expand = 1
-let g:pear_tree_smart_openers = 0
-let g:pear_tree_smart_closers = 0
-let g:pear_tree_smart_backspace = 0
-
-" Clang stuff - default format style
-let g:clang_format#code_style = "google"
-let g:clang_format#style_options = {
-    \ "IndentWidth" : 4,
-    \ "AccessModifierOffset" : -2}
-
-" **************** COC STUFF **********************
-" Includes LSPs, keybinds, general config/necessities
-source ~/.coc-vimrc
-
-" ************** COLOR, SYNTAX ********************
-colorscheme tokyonight-moon
-syntax on
-highlight Comment cterm=italic gui=italic
-set colorcolumn=80
-
-
-" *************** WHITE SPACE **********************
-set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab ai smartindent
-set showbreak=↪\
-set list
+" **************** DISPLAY *************************
+set number                    " Show line numbers
+set relativenumber            " Relative line numbers
+set colorcolumn=80            " Highlight column 80
+set showbreak=↪\              " Wrapped line indicator
+set list                      " Show whitespace characters
 set listchars=tab:→\ ,nbsp:␣,space:·,extends:⟩,precedes:⟨
-highlight SpecialKey ctermfg=239 guifg=DimGrey
+set laststatus=2              " Always show status line
 
-" *************** KEYBINDS *************************
-" remove <C-\> for vim/tmux pane nav
-let g:tmux_navigator_no_mappings = 1
-nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
-nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
-nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
-nnoremap <silent> <nop> :TmuxNavigatePrevious<cr>
-" NERDTree toggle
-map <C-\> :NERDTreeToggle<CR>
-" NERDTree on right
-let g:NERDTreeWinPos = "right"
-" Unbind some useless/annoying default key bindings.
-nmap Q <Nop> " 'Q' in normal mode enters Ex mode. You almost never want this.
-" Emmet tab to expand (avoid leader)
-let g:user_emmet_expandabbr_key = '<tab>'
+" **************** COLORS **************************
+syntax on                     " Enable syntax highlighting
+highlight Comment cterm=italic
+highlight SpecialKey ctermfg=239
 
-" ****************** MISC **************************
-" Folding
-set foldmethod=syntax
+" **************** INDENTATION *********************
+set tabstop=4                 " Tab width
+set softtabstop=0             " Disable soft tabs
+set expandtab                 " Use spaces instead of tabs
+set shiftwidth=4              " Indent width
+set smarttab                  " Smart tab behavior
+set autoindent                " Auto-indent new lines
+set smartindent               " Smart indenting
 
-" Cursor
+" **************** FOLDING *************************
+set foldmethod=syntax         " Fold based on syntax
+
+" **************** SEARCH **************************
+set incsearch                 " Incremental search
+set ignorecase                " Ignore case in search
+set smartcase                 " Case-sensitive if uppercase present
+set hlsearch                  " Highlight search results
+
+" **************** SPLITS **************************
+set splitbelow                " Horizontal splits below
+set splitright                " Vertical splits to the right
+
+" **************** CLIPBOARD ***********************
+set clipboard=unnamedplus     " Sync with system clipboard
+
+" **************** BACKSPACE ***********************
+set backspace=indent,eol,start " Intuitive backspace behavior
+
+" **************** BUFFERS *************************
+set hidden                    " Allow hidden buffers
+
+" **************** BACKUP/SWAP *********************
+set nobackup                  " No backup files
+set nowritebackup             " No backup before overwriting
+set noswapfile                " No swap files
+
+" **************** UPDATE TIME *********************
+set updatetime=1000           " Faster updates (for git, etc)
+
+" **************** BELLS ***************************
+set noerrorbells              " No error bells
+set visualbell                " Visual bell instead of beep
+set t_vb=                     " Disable visual bell
+
+" **************** MOUSE ***************************
+set mouse=a                   " Enable mouse support
+
+" **************** CURSOR **************************
+" Cursor shape (blinking bar in insert, block in normal)
 let &t_SI = "\e[5 q"
 let &t_EI = "\e[0 q"
 augroup myCmds
-au!
-autocmd VimEnter * silent !echo -ne "\e[0 q"
+  au!
+  autocmd VimEnter * silent !echo -ne "\e[0 q"
 augroup END
 
-" Disable the default Vim startup message.
-set shortmess+=I
+" **************** STARTUP MESSAGE *****************
+set shortmess+=I              " Disable startup message
 
-set number " Show line numbers.
-set relativenumber
-" sync clipboard register and default register
-set clipboard+=unnamedplus
+" **************** KEYBINDS ************************
+" Disable Ex mode
+nmap Q <Nop>
 
-" More natural splits
-set splitbelow
-set splitright
-
-" termdebug stuff
-packadd termdebug
-let g:termdebug_wide=1
+" Terminal escape (if using :terminal)
 tnoremap <Esc> <C-\><C-n>
 
-" Always show the status line at the bottom, even if you only have one window open.
-set laststatus=2
+" **************** TERMDEBUG ***********************
+packadd termdebug
+let g:termdebug_wide=1
 
-" More intuitive backsapce  behavior
-set backspace=indent,eol,start
-
-set hidden
-
-" Search stuff
-set incsearch
-set ignorecase
-set smartcase
-set hls
-
-" smaller update time
-set updatetime=1000
-
-" Disable audible bell because it's annoying.
-set noerrorbells visualbell t_vb=
-
-set mouse+=a " necessary evil
+" **************** FILE SETTINGS *******************
+filetype plugin indent on     " Enable filetype detection and plugins

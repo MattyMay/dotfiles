@@ -19,10 +19,11 @@
     # vim stuff
     ~/.vimrc:
       path: vim/vimrc
-    ~/.config/nvim/init.vim:
-      path: vim/init.vim
-    ~/.coc-vimrc:
-      path: vim/coc-vimrc
+    ~/.config/nvim/init.lua:
+      path: vim/init.lua
+    ~/.config/nvim/lua/:
+      glob: true
+      path: vim/lua/**
     ~/.ideavimrc:
       path: misc/ideavimrc
     ~/.config/nvim/coc-settings.json:

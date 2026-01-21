@@ -1,0 +1,19 @@
+-- Vimwiki settings
+vim.g.vimwiki_list = {
+  {
+    path = vim.fn.expand('$HOME/vimwiki'),
+    syntax = 'markdown',
+    ext = '.md',
+    links_space_char = '_'
+  }
+}
+
+vim.g.vimwiki_global_ext = 0
+vim.g.vimwiki_dir_link = 'index'
+vim.g.vimwiki_autowriteall = 0
+
+-- Taskwiki sort orders
+vim.g.taskwiki_sort_orders = {
+  U = "urgency-",
+  D = "due+"
+}

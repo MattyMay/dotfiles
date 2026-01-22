@@ -46,7 +46,12 @@ require("lazy").setup({
   -- HTML/templating
   { 'mattn/emmet-vim' },
   { 'glench/vim-jinja2-syntax' },
-  { 'andymass/vim-matchup' },
+  { 
+    'andymass/vim-matchup',
+    config = function()
+      vim.g.matchup_matchparen_offscreen = { method = "popup" }
+    end
+  },
 
   -- Git integration
   { 'tpope/vim-fugitive' },

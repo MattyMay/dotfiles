@@ -31,7 +31,7 @@ __git_status() {
 
 # Show SSH host
 __host_prefix() {
-  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  if [[ -v $IS_SSH ]]; then
     printf "$USER@$(hostname):"
   fi
 }

@@ -8,19 +8,18 @@ alias ls='ls --color=auto'
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -lF'
-alias vim='nvim'
-# alias python='python3'
-alias pip='pip3'
 alias clip='xclip -sel clip'
-alias wiki='vim ~/vimwiki/index.md'
-alias wi='vim ~/vimwiki/index.md'
+
+# `git ll` alias for git log in graph view
+git config --global alias.ll 'log --graph --format="%C(yellow)%h%C(red)%d%C(reset) - %C(bold green)(%ar)%C(reset) %s %C(blue)<%an>%C(reset)"'
 
 # docker clean ALL cache
 alias docker_clean_all='docker kill -f $(docker ps -q); docker rm -f $(docker ps --filter=status=exited --filter=status=created -q); docker rmi -f $(docker images -a -q);'
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+if [[ ! -v $IS_SSH ]]; then
+    alias vim='nvim'
+    alias wi='vim ~/vimwiki/index.md'
+fi
 
-# `git ll` alias for git log in graph view
-git config --global alias.ll 'log --graph --format="%C(yellow)%h%C(red)%d%C(reset) - %C(bold green)(%ar)%C(reset) %s %C(blue)<%an>%C(reset)"'
+
+

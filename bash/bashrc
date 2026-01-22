@@ -5,15 +5,7 @@ case $- in
       *) return;;
 esac
 
-DOTFILES_DIR="$HOME/dotfiles"
-
-# if linuxify script exists (for Mac), run it
-if [ -f "~/.linuxify" ];  then
-    source ~/.linuxify
-fi
-
-# Editor
-export EDITOR=nvim
+INCLUDES_DIR="$HOME/dotfiles/bash/bashrc_includes"
 
 # Vim keybinds
 set -o vi
@@ -58,18 +50,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# First login will start ssh-agent. Every shell after will share it.
-if [ ! -S ~/.ssh/ssh_auth_sock ]; then
-  eval `ssh-agent`
-  ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
-fi
-export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
-ssh-add -l > /dev/null || ssh-add
-
 # mkcd function
 mkcd () {
   case "$1" in
@@ -82,25 +62,44 @@ mkcd () {
   esac
 }
 
-# cargo for rust
-. "$HOME/.cargo/env"
-
-# opam env
-eval $(opam env)
-
-# configure thefuck alias
-eval "$(thefuck --alias)"
-
-# add dirs to PATH
-export PATH="$HOME/.cargo/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    echo "SSH!!!!!"
+    export IS_SSH=true
+else
+    # if linuxify script exists (for Mac), run it
+    if [ -f "~/.linuxify" ];  then
+        source ~/.linuxify
+    fi
+    
+    # Editor
+    export EDITOR=nvim
+    
+    # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+    export PATH="$PATH:$HOME/.rvm/bin"
+    source "/etc/profile.d/rvm.sh"
+    
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    
+    # cargo for rust
+    . "$HOME/.cargo/env"
+    
+    # opam env
+    eval $(opam env)
+    
+    # configure thefuck alias
+    eval "$(thefuck --alias)"
+    
+    # add dirs to PATH
+    export PATH="$HOME/.cargo/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+fi
 
 # source all bashrc includes
-for FILE in $DOTFILES_DIR/bash/bashrc_includes/*; do
+for FILE in $INCLUDES_DIR/*; do
     source $FILE
 done
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-source "/etc/profile.d/rvm.sh"
-
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

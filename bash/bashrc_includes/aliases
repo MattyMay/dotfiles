@@ -10,10 +10,15 @@ alias la='ls -A'
 alias l='ls -lF'
 alias clip='xclip -sel clip'
 
-# `git ll` alias for git log in graph view
 git config --global alias.ll 'log --graph --format="%C(yellow)%h%C(red)%d%C(reset) - %C(bold green)(%ar)%C(reset) %s %C(blue)<%an>%C(reset)"'
+git config --global alias.subreset "!f() { \
+        if [ \"$1\" = \"--hard\" ]; then \
+            git submodule foreach --recursive 'git reset --hard && git clean -fdx'; \
+        fi; \
+        git submodule sync --recursive && \
+        git submodule update --init --recursive; \
+    }; f"
 
-# docker clean ALL cache
 alias docker_clean_all='docker kill -f $(docker ps -q); docker rm -f $(docker ps --filter=status=exited --filter=status=created -q); docker rmi -f $(docker images -a -q);'
 
 if [[ ! -v $IS_SSH ]]; then

@@ -1,9 +1,6 @@
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
--- Leader key (if needed)
-vim.g.mapleader = " "
-
 -- Disable Q (Ex mode)
 map('n', 'Q', '<Nop>', opts)
 

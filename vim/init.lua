@@ -10,6 +10,7 @@ local function safe_require(module)
   local ok, err = pcall(require, module)
   if not ok then
     vim.notify("Failed to load " .. module, vim.log.levels.WARN)
+    vim.notify(err, vim.log.levels.WARN)
   end
 end
 

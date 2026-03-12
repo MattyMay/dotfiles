@@ -9,3 +9,8 @@ size = 12.0
 
 [window]
 decorations = "none"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"

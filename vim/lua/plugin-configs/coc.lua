@@ -1,5 +1,6 @@
 local map = vim.keymap.set
 local opts = { silent = true, noremap = true }
+local plug_opts = { silent = true, remap = true }
 
 -- CoC extensions
 vim.g.coc_global_extensions = {
@@ -35,14 +36,14 @@ end
 map('i', '<C-space>', 'coc#refresh()', { expr = true, silent = true })
 
 -- Navigation
-map('n', '[g', '<Plug>(coc-diagnostic-prev)', opts)
-map('n', ']g', '<Plug>(coc-diagnostic-next)', opts)
+map('n', '[g', '<Plug>(coc-diagnostic-prev)', plug_opts)
+map('n', ']g', '<Plug>(coc-diagnostic-next)', plug_opts)
 
 -- GoTo code navigation
-map('n', 'gd', '<Plug>(coc-definition)', opts)
-map('n', 'gy', '<Plug>(coc-type-definition)', opts)
-map('n', 'gi', '<Plug>(coc-implementation)', opts)
-map('n', 'gr', '<Plug>(coc-references)', opts)
+map('n', 'gd', '<Plug>(coc-definition)', plug_opts)
+map('n', 'gy', '<Plug>(coc-type-definition)', plug_opts)
+map('n', 'gi', '<Plug>(coc-implementation)', plug_opts)
+map('n', 'gr', '<Plug>(coc-references)', plug_opts)
 
 -- Show documentation
 map('n', 'K', '<CMD>lua _G.show_docs()<CR>', opts)
@@ -67,28 +68,28 @@ vim.api.nvim_create_autocmd("CursorHold", {
 })
 
 -- Rename
-map('n', '<leader>rn', '<Plug>(coc-rename)', opts)
+map('n', '<leader>rn', '<Plug>(coc-rename)', plug_opts)
 
 -- Format
-map('x', '<leader>f', '<Plug>(coc-format-selected)', opts)
-map('n', '<leader>f', '<Plug>(coc-format-selected)', opts)
+map('x', '<leader>f', '<Plug>(coc-format-selected)', plug_opts)
+map('n', '<leader>f', '<Plug>(coc-format-selected)', plug_opts)
 
 -- Code actions
-map('x', '<leader>a', '<Plug>(coc-codeaction-selected)', opts)
-map('n', '<leader>a', '<Plug>(coc-codeaction-selected)', opts)
-map('n', '<leader>ac', '<Plug>(coc-codeaction)', opts)
-map('n', '<leader>qf', '<Plug>(coc-fix-current)', opts)
-map('n', '<leader>cl', '<Plug>(coc-codelens-action)', opts)
+map('x', '<leader>a', '<Plug>(coc-codeaction-selected)', plug_opts)
+map('n', '<leader>a', '<Plug>(coc-codeaction-selected)', plug_opts)
+map('n', '<leader>ac', '<Plug>(coc-codeaction)', plug_opts)
+map('n', '<leader>qf', '<Plug>(coc-fix-current)', plug_opts)
+map('n', '<leader>cl', '<Plug>(coc-codelens-action)', plug_opts)
 
 -- Text objects
-map('x', 'if', '<Plug>(coc-funcobj-i)', opts)
-map('o', 'if', '<Plug>(coc-funcobj-i)', opts)
-map('x', 'af', '<Plug>(coc-funcobj-a)', opts)
-map('o', 'af', '<Plug>(coc-funcobj-a)', opts)
-map('x', 'ic', '<Plug>(coc-classobj-i)', opts)
-map('o', 'ic', '<Plug>(coc-classobj-i)', opts)
-map('x', 'ac', '<Plug>(coc-classobj-a)', opts)
-map('o', 'ac', '<Plug>(coc-classobj-a)', opts)
+map('x', 'if', '<Plug>(coc-funcobj-i)', plug_opts)
+map('o', 'if', '<Plug>(coc-funcobj-i)', plug_opts)
+map('x', 'af', '<Plug>(coc-funcobj-a)', plug_opts)
+map('o', 'af', '<Plug>(coc-funcobj-a)', plug_opts)
+map('x', 'ic', '<Plug>(coc-classobj-i)', plug_opts)
+map('o', 'ic', '<Plug>(coc-classobj-i)', plug_opts)
+map('x', 'ac', '<Plug>(coc-classobj-a)', plug_opts)
+map('o', 'ac', '<Plug>(coc-classobj-a)', plug_opts)
 
 -- Scroll in floating windows
 map('n', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]], { expr = true, silent = true, nowait = true })
@@ -99,8 +100,8 @@ map('v', '<C-f>', [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"]], {
 map('v', '<C-b>', [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"]], { expr = true, silent = true, nowait = true })
 
 -- Selection ranges
-map('n', '<C-s>', '<Plug>(coc-range-select)', opts)
-map('x', '<C-s>', '<Plug>(coc-range-select)', opts)
+map('n', '<C-s>', '<Plug>(coc-range-select)', plug_opts)
+map('x', '<C-s>', '<Plug>(coc-range-select)', plug_opts)
 
 -- Commands
 vim.api.nvim_create_user_command('Format', 'call CocActionAsync("format")', {})

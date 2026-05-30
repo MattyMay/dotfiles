@@ -26,5 +26,5 @@ if [[ ! -v $IS_SSH ]]; then
     alias wi='vim ~/vimwiki/index.md'
 fi
 
-
-
+alias claude-personal='CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude'
+alias claude-work='CLAUDE_CONFIG_DIR=$HOME/.claude-work claude'

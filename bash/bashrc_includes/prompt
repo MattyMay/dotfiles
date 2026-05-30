@@ -31,7 +31,7 @@ __git_status() {
 
 # Show SSH host
 __host_prefix() {
-  if [[ -v $IS_SSH ]]; then
+  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     printf "$USER@$(hostname):"
   fi
 }
@@ -82,7 +82,7 @@ __prompt() {
     second_line_prefix=$(printf '%*s' "$len" '')
   fi
 
-  printf "${path_prefix}${host}${BLUE}${BOLD}${path}${RESET}${newline}"\
+  printf "${path_prefix}${BOLD}${RED}${host}${RESET}${BLUE}${BOLD}${path}${RESET}${newline}"\
 "${YELLOW}${second_line_prefix}${git_prefix}${branch}${RESET}"\
 "${RED}$(echo "$status" | grep ✗)${RESET}"\
 "${YELLOW}$(echo "$status" | grep 🔀)${RESET}"\

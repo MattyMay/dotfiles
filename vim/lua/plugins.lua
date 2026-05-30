@@ -12,72 +12,100 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Plugin specifications
 require("lazy").setup({
-  -- GitHub Copilot
-  { 'github/copilot.vim' },
+  { "github/copilot.vim" },
 
-  -- Indent guides
-  { 
-    'lukas-reineke/indent-blankline.nvim',
+  {
+    "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
   },
 
-  -- LSP and completion
-  { 
-    'neoclide/coc.nvim',
-    branch = 'release',
+  {
+    "neoclide/coc.nvim",
+    branch = "release",
   },
 
-  -- Navigation and UI
-  { 'christoomey/vim-tmux-navigator' },
-  { 'tpope/vim-commentary' },
-  { 'preservim/nerdtree' },
-  
-  -- Code formatting
-  { 
-    'rhysd/vim-clang-format',
-    dependencies = { 'kana/vim-operator-user' }
+  { "christoomey/vim-tmux-navigator" },
+  { "tpope/vim-commentary" },
+  { "preservim/nerdtree" },
+
+  {
+    "rhysd/vim-clang-format",
+    dependencies = { "kana/vim-operator-user" },
   },
 
-  -- Auto-pairing
-  { 'tmsvg/pear-tree' },
+  { "tmsvg/pear-tree" },
+  { "mattn/emmet-vim" },
+  { "glench/vim-jinja2-syntax" },
 
-  -- HTML/templating
-  { 'mattn/emmet-vim' },
-  { 'glench/vim-jinja2-syntax' },
-  { 
-    'andymass/vim-matchup',
+  {
+    "andymass/vim-matchup",
     config = function()
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
-    end
+    end,
   },
 
-  -- Git integration
-  { 'tpope/vim-fugitive' },
+  { "tpope/vim-fugitive" },
 
-  -- Fuzzy finder
-  { 
-    'junegunn/fzf',
-    build = './install --all'
+  {
+    "junegunn/fzf",
+    build = "./install --all",
   },
-  { 'junegunn/fzf.vim' },
+  { "junegunn/fzf.vim" },
 
-  -- Wiki/tasks
-  { 'vimwiki/vimwiki' },
-  { 'michal-h21/vimwiki-sync' },
-  { 'tools-life/taskwiki' },
+  { "vimwiki/vimwiki" },
+  { "michal-h21/vimwiki-sync" },
+  { "tools-life/taskwiki" },
 
-  -- Neovim specific
-  { 'folke/todo-comments.nvim' },
-  { 
-    'folke/tokyonight.nvim',
+  { "folke/todo-comments.nvim" },
+  {
+    "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
   },
-  { 'nvim-lualine/lualine.nvim' },
-  { 
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate'
-  },
+  { "nvim-lualine/lualine.nvim" },
+
+  {
+    "nvim-treesitter/nvim-treesitter",
+    branch = "master",
+    build = ":TSUpdate",
+    lazy = false,
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        sync_install = false,
+        auto_install = true,
+        ensure_installed = {
+          "bash",
+          "c",
+          "cpp",
+          "css",
+          "dockerfile",
+          "html",
+          "javascript",
+          "json",
+          "jsonc",
+          "lua",
+          "markdown",
+          "python",
+          "query",
+          "rust",
+          "scss",
+          "toml",
+          "tsx",
+          "typescript",
+          "vim",
+          "vimdoc",
+          "vue",
+          "yaml",
+        },
+        highlight = {
+          enable = true,
+          disable = {},
+        },
+        indent = {
+          enable = true,
+        },
+      })
+    end,
+  }
 })

@@ -14,7 +14,7 @@ local function safe_require(module)
   end
 end
 
-safe_require('plugin-configs.treesitter')
+-- safe_require('plugin-configs.treesitter')
 safe_require('plugin-configs.lualine')
 safe_require('plugin-configs.indent-blankline')
 safe_require('plugin-configs.vimwiki')

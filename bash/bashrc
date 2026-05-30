@@ -103,3 +103,18 @@ for FILE in $INCLUDES_DIR/*; do
 done
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+case ":$PATH:" in
+    *:/home/mattmayf/.juliaup/bin:*)
+        ;;
+
+    *)
+        export PATH=/home/mattmayf/.juliaup/bin${PATH:+:${PATH}}
+        ;;
+esac
+
+# <<< juliaup initialize <<<

@@ -39,3 +39,18 @@ fi
 test -r /home/mattm/.opam/opam-init/init.sh && . /home/mattm/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+case ":$PATH:" in
+    *:/home/mattmayf/.juliaup/bin:*)
+        ;;
+
+    *)
+        export PATH=/home/mattmayf/.juliaup/bin${PATH:+:${PATH}}
+        ;;
+esac
+
+# <<< juliaup initialize <<<

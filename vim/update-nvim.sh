@@ -97,7 +97,7 @@ download_version() {
     local version="$1"
     local dest="$NVIM_VERSIONS_DIR/$version"
 
-    [[ -f "$dest" ]] && { echo "Version $version already downloaded."; echo "$dest"; return; }
+    [[ -f "$dest" ]] && { echo "Version $version already downloaded." >&2; echo "$dest"; return; }
 
     mkdir -p "$NVIM_VERSIONS_DIR"
 
@@ -107,14 +107,14 @@ download_version() {
     # shellcheck disable=SC2064
     trap "rm -rf '$tmp'" EXIT
 
-    echo "Downloading nvim $version..."
+    echo "Downloading nvim $version..." >&2
     curl -fL --progress-bar "$url" -o "$tmp/nvim.tar.gz" \
         || die "Download failed. Check that $version exists at github.com/neovim/neovim/releases"
 
     tar -xzf "$tmp/nvim.tar.gz" -C "$tmp"
     cp "$tmp/nvim-linux-x86_64/bin/nvim" "$dest"
     chmod +x "$dest"
-    echo "Saved nvim $version to $dest"
+    echo "Saved nvim $version to $dest" >&2
     echo "$dest"
 }
 

@@ -29,7 +29,7 @@ Options:
 
 Upgrade workflow:
   $(basename "$0")               # install latest
-  ./vim/tests/run.sh             # verify config still works
+  ./vim/test.sh                  # verify config still works
   $(basename "$0") --pin         # record version in .nvim-version
   git add .nvim-version && git commit
 EOF

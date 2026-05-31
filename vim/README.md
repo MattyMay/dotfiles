@@ -30,7 +30,7 @@ The file `.nvim-version` records the version that CI runs against. When the test
 ./vim/update-nvim.sh
 
 # 2. Verify the config still works
-./vim/tests/run.sh
+./vim/test.sh
 
 # 3. Record the new version
 ./vim/update-nvim.sh --pin
@@ -60,7 +60,7 @@ The script stores versioned binaries in `~/.local/share/nvim-versions/` and keep
 ## Running tests locally
 
 ```bash
-./vim/tests/run.sh
+./vim/test.sh
 ```
 
 Uses a throwaway XDG environment so it never touches your real `~/.config/nvim`.

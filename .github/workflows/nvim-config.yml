@@ -1,0 +1,28 @@
+name: nvim-config
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    name: Verify Neovim config
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim (stable)
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Install build dependencies
+        # build-essential provides the C compiler tree-sitter parsers need.
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Run config tests
+        run: ./vim/tests/run.sh

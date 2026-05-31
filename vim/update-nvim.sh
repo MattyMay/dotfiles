@@ -8,6 +8,11 @@ KEEP_VERSIONS=3
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PIN_FILE="${PIN_FILE:-$SCRIPT_DIR/.nvim-version}"
 
+# Storage layout: each version is a full extracted tarball directory.
+#   $NVIM_VERSIONS_DIR/v0.11.5/bin/nvim     ← binary
+#   $NVIM_VERSIONS_DIR/v0.11.5/share/nvim/  ← runtime files nvim needs
+#   $NVIM_LINK → .../v0.11.5/bin/nvim       ← active symlink
+
 usage() {
     cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
@@ -33,9 +38,18 @@ EOF
 
 die() { echo "error: $*" >&2; exit 1; }
 
+# Returns the version directory that $NVIM_LINK currently points into, or "".
+active_version_dir() {
+    [[ -L "$NVIM_LINK" ]] || { echo ""; return; }
+    local target bin_dir
+    target=$(readlink "$NVIM_LINK")
+    bin_dir=$(dirname "$target")
+    dirname "$bin_dir"
+}
+
 list_versions() {
-    local current=""
-    [[ -L "$NVIM_LINK" ]] && current=$(readlink "$NVIM_LINK")
+    local current_dir
+    current_dir=$(active_version_dir)
 
     if [[ ! -d "$NVIM_VERSIONS_DIR" ]] || [[ -z "$(ls -A "$NVIM_VERSIONS_DIR" 2>/dev/null)" ]]; then
         echo "No managed nvim versions found in $NVIM_VERSIONS_DIR"
@@ -46,12 +60,12 @@ list_versions() {
     while IFS= read -r v; do
         local name
         name=$(basename "$v")
-        if [[ "$v" == "$current" ]]; then
+        if [[ "$v" == "$current_dir" ]]; then
             echo "  * $name"
         else
             echo "    $name"
         fi
-    done < <(ls -t "$NVIM_VERSIONS_DIR"/v* 2>/dev/null)
+    done < <(ls -td "$NVIM_VERSIONS_DIR"/v* 2>/dev/null)
 
     if [[ -f "$PIN_FILE" ]]; then
         echo ""
@@ -81,8 +95,6 @@ do_pin() {
     local current
     current=$(get_active_version)
     [[ -n "$current" ]] || die "No active managed nvim found at $NVIM_LINK"
-
-    # Normalise: ensure version has a leading 'v'
     [[ "$current" == v* ]] || current="v$current"
 
     local pin_dir
@@ -93,11 +105,14 @@ do_pin() {
     echo "Pinned $current → $PIN_FILE"
 }
 
+# Downloads and extracts the full tarball so runtime files are present alongside
+# the binary. Returns the path to the nvim binary via stdout.
 download_version() {
     local version="$1"
-    local dest="$NVIM_VERSIONS_DIR/$version"
+    local dest_dir="$NVIM_VERSIONS_DIR/$version"
+    local dest_bin="$dest_dir/bin/nvim"
 
-    [[ -f "$dest" ]] && { echo "Version $version already downloaded." >&2; echo "$dest"; return; }
+    [[ -f "$dest_bin" ]] && { echo "Version $version already downloaded." >&2; echo "$dest_bin"; return; }
 
     mkdir -p "$NVIM_VERSIONS_DIR"
 
@@ -112,53 +127,52 @@ download_version() {
         || die "Download failed. Check that $version exists at github.com/neovim/neovim/releases"
 
     tar -xzf "$tmp/nvim.tar.gz" -C "$tmp"
-    cp "$tmp/nvim-linux-x86_64/bin/nvim" "$dest"
-    chmod +x "$dest"
-    echo "Saved nvim $version to $dest" >&2
-    echo "$dest"
+    mv "$tmp/nvim-linux-x86_64" "$dest_dir"
+    echo "Saved nvim $version to $dest_dir" >&2
+    echo "$dest_bin"
 }
 
 activate_version() {
-    local dest="$1"
+    local dest_bin="$1"
     mkdir -p "$(dirname "$NVIM_LINK")"
-    ln -sf "$dest" "$NVIM_LINK"
+    ln -sf "$dest_bin" "$NVIM_LINK"
     echo "Activated: $("$NVIM_LINK" --version | head -1)"
 }
 
 prune_versions() {
-    local current=""
-    [[ -L "$NVIM_LINK" ]] && current=$(readlink "$NVIM_LINK")
+    local current_dir
+    current_dir=$(active_version_dir)
 
     local -a versions=()
     while IFS= read -r v; do
         versions+=("$v")
-    done < <(ls -t "$NVIM_VERSIONS_DIR"/v* 2>/dev/null)
+    done < <(ls -td "$NVIM_VERSIONS_DIR"/v* 2>/dev/null)
 
     local count=${#versions[@]}
     (( count <= KEEP_VERSIONS )) && return
 
     for v in "${versions[@]:$KEEP_VERSIONS}"; do
-        [[ "$v" == "$current" ]] && continue
-        echo "Removing old version: $(basename "$v")"
-        rm -f "$v"
+        [[ "$v" == "$current_dir" ]] && continue
+        echo "Removing old version: $(basename "$v")" >&2
+        rm -rf "$v"
     done
 }
 
 do_rollback() {
     [[ -L "$NVIM_LINK" ]] || die "No managed nvim symlink at $NVIM_LINK. Run the script without --rollback first."
 
-    local current
-    current=$(readlink "$NVIM_LINK")
+    local current_dir
+    current_dir=$(active_version_dir)
 
-    local prev=""
+    local prev_dir=""
     while IFS= read -r v; do
-        [[ "$v" != "$current" ]] && { prev="$v"; break; }
-    done < <(ls -t "$NVIM_VERSIONS_DIR"/v* 2>/dev/null)
+        [[ "$v" != "$current_dir" ]] && { prev_dir="$v"; break; }
+    done < <(ls -td "$NVIM_VERSIONS_DIR"/v* 2>/dev/null)
 
-    [[ -n "$prev" ]] || die "No previous version to roll back to. Only $(basename "$current") is installed."
+    [[ -n "$prev_dir" ]] || die "No previous version to roll back to. Only $(basename "$current_dir") is installed."
 
-    ln -sf "$prev" "$NVIM_LINK"
-    echo "Rolled back: $(basename "$current") → $(basename "$prev")"
+    ln -sf "$prev_dir/bin/nvim" "$NVIM_LINK"
+    echo "Rolled back: $(basename "$current_dir") → $(basename "$prev_dir")"
     "$NVIM_LINK" --version | head -1
 }
 

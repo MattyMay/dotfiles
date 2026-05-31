@@ -36,18 +36,28 @@ echo "==> [1/3] Lua syntax check"
 nvim --headless --clean -c "luafile $REPO_ROOT/vim/tests/lint.lua" +qa
 
 echo "==> [2/3] Installing plugins in an isolated environment"
-TEST_HOME="$(mktemp -d)"
-trap 'rm -rf "$TEST_HOME"' EXIT
-export XDG_CONFIG_HOME="$TEST_HOME/config"
-export XDG_DATA_HOME="$TEST_HOME/data"
-export XDG_STATE_HOME="$TEST_HOME/state"
-export XDG_CACHE_HOME="$TEST_HOME/cache"
+# Use a caller-provided XDG environment if one is set (e.g. CI, so the plugin
+# directory under XDG_DATA_HOME can be cached across runs). Otherwise create a
+# throwaway one and remove it on exit.
+if [ -n "${XDG_CONFIG_HOME:-}" ] && [ -n "${XDG_DATA_HOME:-}" ]; then
+  echo "    using caller-provided XDG environment"
+else
+  TEST_HOME="$(mktemp -d)"
+  trap 'rm -rf "$TEST_HOME"' EXIT
+  export XDG_CONFIG_HOME="$TEST_HOME/config"
+  export XDG_DATA_HOME="$TEST_HOME/data"
+  export XDG_STATE_HOME="$TEST_HOME/state"
+  export XDG_CACHE_HOME="$TEST_HOME/cache"
+fi
 
+# Rebuild the config dir from scratch each run (it is never cached); the plugin
+# directory under XDG_DATA_HOME may be a warm cache and is left untouched.
+rm -rf "$XDG_CONFIG_HOME/nvim"
 mkdir -p "$XDG_CONFIG_HOME/nvim/lua"
-ln -s "$REPO_ROOT/vim/init.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
-ln -s "$REPO_ROOT/vim/coc-settings.json" "$XDG_CONFIG_HOME/nvim/coc-settings.json"
+ln -sf "$REPO_ROOT/vim/init.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
+ln -sf "$REPO_ROOT/vim/coc-settings.json" "$XDG_CONFIG_HOME/nvim/coc-settings.json"
 for entry in "$REPO_ROOT"/vim/lua/*; do
-  ln -s "$entry" "$XDG_CONFIG_HOME/nvim/lua/$(basename "$entry")"
+  ln -sf "$entry" "$XDG_CONFIG_HOME/nvim/lua/$(basename "$entry")"
 done
 
 run nvim --headless "+Lazy! sync" +qa

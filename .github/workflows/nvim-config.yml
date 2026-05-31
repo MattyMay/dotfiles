@@ -10,6 +10,12 @@ jobs:
     name: Verify Neovim config
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # Isolated, cacheable XDG environment that vim/tests/run.sh will reuse.
+      XDG_CONFIG_HOME: ${{ github.workspace }}/.xdg/config
+      XDG_DATA_HOME: ${{ github.workspace }}/.xdg/data
+      XDG_STATE_HOME: ${{ github.workspace }}/.xdg/state
+      XDG_CACHE_HOME: ${{ github.workspace }}/.xdg/cache
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,5 +30,41 @@ jobs:
         # build-essential provides the C compiler tree-sitter parsers need.
         run: sudo apt-get update && sudo apt-get install -y build-essential
 
+      - name: Record Neovim version
+        id: nvim
+        run: echo "version=$(nvim --version | head -1 | tr -d ' ')" >> "$GITHUB_OUTPUT"
+
+      # Restore the lazy.nvim plugin directory. The exact key (below) is the
+      # hash of the generated lock file, so an exact hit means identical plugin
+      # versions; the restore-keys prefixes warm-start from the latest cache for
+      # this OS + Neovim version when the versions have moved.
+      - name: Restore plugin cache
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.XDG_DATA_HOME }}/nvim/lazy
+          key: lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-${{ hashFiles('vim/lua/plugins/**/*.lua', 'vim/init.lua') }}
+          restore-keys: |
+            lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-
+            lazy-${{ runner.os }}-
+
       - name: Run config tests
         run: ./vim/tests/run.sh
+
+      # Hash the lock file lazy wrote during the test run. This pins the exact
+      # commit of every plugin, so it is the authoritative version identifier.
+      - name: Hash resolved plugin versions
+        id: lock
+        if: always()
+        run: |
+          lock="$XDG_CONFIG_HOME/nvim/lazy-lock.json"
+          if [ -f "$lock" ]; then
+            echo "hash=$(sha256sum "$lock" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Save plugin cache
+        if: always() && steps.lock.outputs.hash != ''
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.XDG_DATA_HOME }}/nvim/lazy
+          key: lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-${{ steps.lock.outputs.hash }}

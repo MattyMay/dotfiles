@@ -26,7 +26,6 @@ for _, name in ipairs({
   "nvim-treesitter",
   "lualine.nvim",
   "indent-blankline.nvim",
-  "copilot.vim",
   "nerdtree",
   "vim-tmux-navigator",
   "vimwiki",
@@ -49,8 +48,7 @@ check("coc_global_extensions is a list", type(vim.g.coc_global_extensions) == "t
 check("coc-pyright extension configured", vim.tbl_contains(vim.g.coc_global_extensions or {}, "coc-pyright"))
 check("coc-lua extension configured", vim.tbl_contains(vim.g.coc_global_extensions or {}, "coc-lua"))
 check("tmux_navigator_no_mappings = 1", vim.g.tmux_navigator_no_mappings == 1)
-check("copilot_no_tab_map = 1", vim.g.copilot_no_tab_map == 1)
-check("emmet expand key is <tab>", vim.g.user_emmet_expandabbr_key == "<tab>")
+check("emmet expand key is <leader><tab>", vim.g.user_emmet_expandabbr_key == "<leader><tab>")
 check("NERDTreeWinPos is right", vim.g.NERDTreeWinPos == "right")
 check("vimwiki_list configured", type(vim.g.vimwiki_list) == "table" and #vim.g.vimwiki_list == 1)
 check("taskwiki_sort_orders configured", type(vim.g.taskwiki_sort_orders) == "table")

@@ -14,7 +14,7 @@ return {
   {
     "mattn/emmet-vim",
     init = function()
-      vim.g.user_emmet_expandabbr_key = "<tab>"
+      vim.g.user_emmet_expandabbr_key = "<leader><tab>"
     end,
   },
 

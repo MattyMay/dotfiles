@@ -1,23 +1,21 @@
--- Load plugins FIRST
-require('plugins')
+-- Core options and keymaps (no plugin dependencies)
+require("settings")
+require("keymaps")
 
--- Load core settings
-require('settings')
-require('keymaps')
-
--- Load plugin configurations (with pcall to handle missing plugins gracefully)
-local function safe_require(module)
-  local ok, err = pcall(require, module)
-  if not ok then
-    vim.notify("Failed to load " .. module, vim.log.levels.WARN)
-    vim.notify(err, vim.log.levels.WARN)
-  end
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
 end
+vim.opt.rtp:prepend(lazypath)
 
--- safe_require('plugin-configs.treesitter')
-safe_require('plugin-configs.lualine')
-safe_require('plugin-configs.indent-blankline')
-safe_require('plugin-configs.vimwiki')
-safe_require('plugin-configs.misc')
-safe_require('plugin-configs.coc')
-
+-- Load every plugin spec under lua/plugins/. Each module carries its own
+-- configuration (init/opts/config), so there is no central wiring to maintain.
+require("lazy").setup("plugins")

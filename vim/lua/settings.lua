@@ -19,11 +19,9 @@ opt.listchars = {
 }
 opt.laststatus = 2
 
--- Colors and syntax
-vim.cmd('colorscheme tokyonight-moon')
+-- Syntax (colorscheme and custom highlights live in plugins/tokyonight.lua,
+-- since the colorscheme isn't available until plugins load)
 vim.cmd('syntax on')
-vim.cmd('highlight Comment cterm=italic gui=italic')
-vim.cmd('highlight SpecialKey ctermfg=239 guifg=DimGrey')
 
 -- Indentation and whitespace
 opt.tabstop = 4

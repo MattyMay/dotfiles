@@ -1,30 +1,13 @@
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
+-- Plugin-specific keymaps live in their specs under lua/plugins/.
+
 -- Disable Q (Ex mode)
 map('n', 'Q', '<Nop>', opts)
 
--- Vim-tmux navigator
-vim.g.tmux_navigator_no_mappings = 1
-map('n', '<C-h>', ':TmuxNavigateLeft<CR>', opts)
-map('n', '<C-j>', ':TmuxNavigateDown<CR>', opts)
-map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)
-map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)
-
--- NERDTree toggle
-map('n', '<C-\\>', ':NERDTreeToggle<CR>', opts)
-vim.g.NERDTreeWinPos = "right"
-
--- Copilot accept
-map('i', '<leader><tab>', 'copilot#Accept("")', { expr = true, silent = true })
-vim.g.copilot_no_tab_map = 1
-
 -- Terminal mode escape
 map('t', '<Esc>', '<C-\\><C-n>', opts)
-
--- Emmet
-vim.g.user_emmet_expandabbr_key = '<tab>'
-
 
 -- quickfix list navigation
 vim.api.nvim_create_autocmd('FileType', {

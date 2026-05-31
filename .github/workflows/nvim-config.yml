@@ -20,11 +20,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Neovim (stable)
+      - name: Read pinned Neovim version
+        id: nvim-pin
+        run: echo "version=$(cat vim/.nvim-version)" >> "$GITHUB_OUTPUT"
+
+      - name: Install Neovim ${{ steps.nvim-pin.outputs.version }}
         uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
-          version: stable
+          version: ${{ steps.nvim-pin.outputs.version }}
 
       - name: Install build dependencies
         # build-essential provides the C compiler tree-sitter parsers need.

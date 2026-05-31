@@ -52,7 +52,7 @@ set nowritebackup             " No backup before overwriting
 set noswapfile                " No swap files
 
 " **************** UPDATE TIME *********************
-set updatetime=1000           " Faster updates (for git, etc)
+set updatetime=300            " Faster updates (CoC recommends 300)
 
 " **************** BELLS ***************************
 set noerrorbells              " No error bells

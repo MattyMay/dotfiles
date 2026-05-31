@@ -46,9 +46,7 @@ map('n', 'gi', '<Plug>(coc-implementation)', plug_opts)
 map('n', 'gr', '<Plug>(coc-references)', plug_opts)
 
 -- Show documentation
-map('n', 'K', '<CMD>lua _G.show_docs()<CR>', opts)
-
-function _G.show_docs()
+local function show_docs()
   local cw = vim.fn.expand('<cword>')
   if vim.fn.index({'vim', 'help'}, vim.bo.filetype) >= 0 then
     vim.api.nvim_command('h ' .. cw)
@@ -58,6 +56,7 @@ function _G.show_docs()
     vim.api.nvim_command('!' .. vim.o.keywordprg .. ' ' .. cw)
   end
 end
+map('n', 'K', show_docs, opts)
 
 -- Highlight symbol under cursor
 vim.api.nvim_create_autocmd("CursorHold", {
@@ -121,31 +120,33 @@ map('n', '<space>k', ':<C-u>CocPrev<CR>', opts)
 map('n', '<space>p', ':<C-u>CocListResume<CR>', opts)
 
 -- Custom split function
-function _G.split_if_not_open(...)
+local function split_if_not_open(...)
   local args = {...}
   local fname = args[1]
   local call = ''
-  
+
   if #args == 2 then
     fname = args[2]
     call = args[1]
   end
-  
+
   local bufnum = vim.fn.bufnr(vim.fn.expand(fname))
   local winnum = vim.fn.bufwinnr(bufnum)
-  
+
   if winnum ~= -1 then
     vim.cmd(winnum .. "wincmd w")
   else
     vim.cmd("vsplit " .. fname)
   end
-  
+
   if call ~= '' then
     vim.cmd(call)
   end
 end
 
-vim.api.nvim_create_user_command('CocSplitIfNotOpen', 'lua _G.split_if_not_open(<f-args>)', { nargs = '+' })
+vim.api.nvim_create_user_command('CocSplitIfNotOpen', function(cmd)
+  split_if_not_open(unpack(cmd.fargs))
+end, { nargs = '+' })
 
 -- Statusline
 vim.opt.statusline = "%{coc#status()}%{get(b:,'coc_current_function','')}"

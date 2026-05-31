@@ -96,29 +96,5 @@ opt.ruler = false
 -- Termdebug
 vim.cmd('packadd termdebug')
 g.termdebug_wide = 1
-local map = vim.keymap.set
-local opts = { noremap = true, silent = true }
 
--- Disable Q (Ex mode)
-map('n', 'Q', '<Nop>', opts)
-
--- Vim-tmux navigator
-vim.g.tmux_navigator_no_mappings = 1
-map('n', '<C-h>', ':TmuxNavigateLeft<CR>', opts)
-map('n', '<C-j>', ':TmuxNavigateDown<CR>', opts)
-map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)
-map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)
-
--- NERDTree toggle
-map('n', '<C-\\>', ':NERDTreeToggle<CR>', opts)
-vim.g.NERDTreeWinPos = "right"
-
--- Copilot accept
-map('i', '<leader><tab>', 'copilot#Accept("")', { expr = true, silent = true })
-vim.g.copilot_no_tab_map = 1
-
--- Terminal mode escape
-map('t', '<Esc>', '<C-\\><C-n>', opts)
-
--- Emmet
-vim.g.user_emmet_expandabbr_key = '<tab>'
+-- NOTE: keymaps live in keymaps.lua (loaded separately from init.lua)

@@ -2,12 +2,19 @@
 -- have been installed. Run with: nvim --headless -c 'luafile verify.lua'
 -- Exits non-zero (via :cq) if any check fails.
 
+-- Write + flush each line immediately so checks stream one by one, even when
+-- stdout is buffered (CI logs, pipes), and the last line is never swallowed by :qa.
+local function emit(line)
+  io.stdout:write(line .. "\n")
+  io.stdout:flush()
+end
+
 local failures = 0
 local function check(name, cond)
   if cond then
-    print("ok   - " .. name)
+    emit("ok   - " .. name)
   else
-    print("FAIL - " .. name)
+    emit("FAIL - " .. name)
     failures = failures + 1
   end
 end
@@ -86,5 +93,18 @@ check("CocSplitIfNotOpen command", cmds.CocSplitIfNotOpen ~= nil)
 -- ── Treesitter configured ────────────────────────────────────────────────────
 check("nvim-treesitter.configs loadable", (pcall(require, "nvim-treesitter.configs")))
 
-print(("\n%d check(s) failed"):format(failures))
+-- ── Regression: coc's <CR> survives in coc's prompt buffer ───────────────────
+-- Make sure other plugins don't clobber coc's <CR> in prompt buffers, breaking
+-- symbol renaming.
+local ok_prompt = pcall(vim.fn["coc#dialog#create_prompt_win"], "Rename", "oldName", {})
+check("coc prompt float can be created", ok_prompt)
+if ok_prompt then
+  vim.cmd("doautocmd InsertEnter")
+  local cr = vim.fn.maparg("<CR>", "i")
+  check("coc's <CR> confirm not clobbered in prompt buffer",
+    cr:find("coc#dialog#prompt_insert", 1, true) ~= nil)
+  pcall(vim.fn["coc#float#close_all"])
+end
+
+emit(("\n%d check(s) failed"):format(failures))
 vim.cmd(failures > 0 and "cq" or "qa")

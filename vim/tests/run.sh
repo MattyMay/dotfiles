@@ -2,9 +2,10 @@
 #
 # Verifies the Neovim configuration in this repo:
 #   1. Byte-compiles every Lua file (syntax check).
-#   2. Sets up an isolated, throwaway nvim environment (never touches your real
-#      ~/.config) and links the repo's config into it the same way
-#      install.conf.yaml does.
+#   2. Sets up an isolated nvim environment (never touches your real ~/.config)
+#      and links the repo's config into it the same way install.conf.yaml does.
+#      Locally this is a persistent cache (TEST_FRESH=1 resets it); in CI the
+#      caller provides the XDG dirs.
 #   3. Installs the plugins with lazy.nvim.
 #   4. Asserts the runtime configuration matches expectations.
 #
@@ -32,18 +33,35 @@ run() {
   fi
 }
 
-echo "==> [1/3] Lua syntax check"
-nvim --headless --clean -c "luafile $REPO_ROOT/vim/tests/lint.lua" +qa
+# Run a command silently, surfacing its output only if it fails.
+quiet() {
+  local out rc
+  if out="$(run "$@" 2>&1)"; then
+    return 0
+  fi
+  rc=$?
+  printf '%s\n' "$out" >&2
+  return "$rc"
+}
 
+echo "==> [1/3] Lua syntax check"
+run nvim --headless --clean -c "luafile $REPO_ROOT/vim/tests/lint.lua" +qa
+
+echo
 echo "==> [2/3] Installing plugins in an isolated environment"
 # Use a caller-provided XDG environment if one is set (e.g. CI, so the plugin
-# directory under XDG_DATA_HOME can be cached across runs). Otherwise create a
-# throwaway one and remove it on exit.
+# directory under XDG_DATA_HOME can be cached across runs). Otherwise fall back
+# to a persistent local cache so repeat local runs reuse installed plugins and
+# parsers instead of cold-starting. Set TEST_FRESH=1 to force a clean run.
 if [ -n "${XDG_CONFIG_HOME:-}" ] && [ -n "${XDG_DATA_HOME:-}" ]; then
   echo "    using caller-provided XDG environment"
 else
-  TEST_HOME="$(mktemp -d)"
-  trap 'rm -rf "$TEST_HOME"' EXIT
+  TEST_HOME="${NVIM_TEST_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-nvim-test}"
+  if [ -n "${TEST_FRESH:-}" ]; then
+    echo "    TEST_FRESH set -- wiping cache at $TEST_HOME"
+    rm -rf "$TEST_HOME"
+  fi
+  echo "    using local cache at $TEST_HOME (TEST_FRESH=1 to reset)"
   export XDG_CONFIG_HOME="$TEST_HOME/config"
   export XDG_DATA_HOME="$TEST_HOME/data"
   export XDG_STATE_HOME="$TEST_HOME/state"
@@ -70,11 +88,11 @@ cp "$REPO_ROOT/vim/lazy-lock.json" "$XDG_CONFIG_HOME/nvim/lazy-lock.json"
 case "${LAZY_MODE:-pinned}" in
   pinned)
     echo "    LAZY_MODE=pinned (lazy-lock.json)"
-    run nvim --headless "+Lazy! install" "+Lazy! restore" +qa
+    quiet nvim --headless "+Lazy! install" "+Lazy! restore" +qa
     ;;
   latest)
     echo "    LAZY_MODE=latest (floating newest commits)"
-    run nvim --headless "+Lazy! sync" +qa
+    quiet nvim --headless "+Lazy! sync" +qa
     ;;
   *)
     echo "error: unknown LAZY_MODE='${LAZY_MODE}' (expected 'pinned' or 'latest')" >&2
@@ -82,7 +100,14 @@ case "${LAZY_MODE:-pinned}" in
     ;;
 esac
 
+# Install parsers now so verify's async auto_install doesn't scribble over it.
+quiet nvim --headless \
+  -c 'lua require("nvim-treesitter.install").ensure_installed_sync(unpack(require("nvim-treesitter.configs").get_ensure_installed_parsers()))' \
+  +qa
+
+echo
 echo "==> [3/3] Verifying runtime configuration"
 run nvim --headless -c "luafile $REPO_ROOT/vim/tests/verify.lua" +qa
 
+echo
 echo "==> All checks passed"

@@ -76,6 +76,18 @@ return {
     -- Rename
     map("n", "<leader>rn", "<Plug>(coc-rename)", plug_opts)
 
+    -- pear-tree's InsertEnter autocmd installs a buffer-local <CR> mapping in
+    -- every buffer, which clobbers coc's confirm mapping inside the rename/input
+    -- float and makes <CR> wipe the prompt instead of submitting. Disable
+    -- pear-tree for coc prompt buffers (this fires before the deferred
+    -- InsertEnter, so pear-tree skips BufferEnable).
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "CocOpenFloatPrompt",
+      callback = function()
+        vim.b.pear_tree_enabled = 0
+      end,
+    })
+
     -- Format
     map("x", "<leader>f", "<Plug>(coc-format-selected)", plug_opts)
     map("n", "<leader>f", "<Plug>(coc-format-selected)", plug_opts)

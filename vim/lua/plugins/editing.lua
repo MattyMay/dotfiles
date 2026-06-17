@@ -2,6 +2,12 @@ return {
   { "tpope/vim-commentary" },
 
   {
+    "nvim-mini/mini.surround",
+    version = false,
+    opts = {},
+  },
+
+  {
     "tmsvg/pear-tree",
     init = function()
       vim.g.pear_tree_repeatable_expand = 1

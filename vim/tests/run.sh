@@ -59,8 +59,28 @@ ln -sf "$REPO_ROOT/vim/coc-settings.json" "$XDG_CONFIG_HOME/nvim/coc-settings.js
 for entry in "$REPO_ROOT"/vim/lua/*; do
   ln -sf "$entry" "$XDG_CONFIG_HOME/nvim/lua/$(basename "$entry")"
 done
+# Copy (not symlink) the lockfile: lazy rewrites it during install/restore, so a
+# symlink would clobber the committed repo copy.
+cp "$REPO_ROOT/vim/lazy-lock.json" "$XDG_CONFIG_HOME/nvim/lazy-lock.json"
 
-run nvim --headless "+Lazy! sync" +qa
+# LAZY_MODE=pinned (default) installs the exact commits in lazy-lock.json, so CI
+# verifies what we actually ship. LAZY_MODE=latest floats every plugin to its
+# newest commit -- a canary for upstream breakage, meant to run on a schedule.
+# (restore/update only touch already-installed plugins, hence install first.)
+case "${LAZY_MODE:-pinned}" in
+  pinned)
+    echo "    LAZY_MODE=pinned (lazy-lock.json)"
+    run nvim --headless "+Lazy! install" "+Lazy! restore" +qa
+    ;;
+  latest)
+    echo "    LAZY_MODE=latest (floating newest commits)"
+    run nvim --headless "+Lazy! sync" +qa
+    ;;
+  *)
+    echo "error: unknown LAZY_MODE='${LAZY_MODE}' (expected 'pinned' or 'latest')" >&2
+    exit 1
+    ;;
+esac
 
 echo "==> [3/3] Verifying runtime configuration"
 run nvim --headless -c "luafile $REPO_ROOT/vim/tests/verify.lua" +qa

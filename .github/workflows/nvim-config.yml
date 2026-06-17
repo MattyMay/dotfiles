@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - '**'
+  # Canary: float every plugin to its newest commit to catch upstream breakage
+  # before a local `:Lazy update` does. Runs on the default branch.
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays 06:00 UTC
+  # Allow triggering the canary (or a normal run) by hand.
+  workflow_dispatch: {}
 
 jobs:
   test:
@@ -16,6 +22,9 @@ jobs:
       XDG_DATA_HOME: ${{ github.workspace }}/.xdg/data
       XDG_STATE_HOME: ${{ github.workspace }}/.xdg/state
       XDG_CACHE_HOME: ${{ github.workspace }}/.xdg/cache
+      # Scheduled runs float to newest plugins (canary); everything else tests
+      # the exact versions pinned in lazy-lock.json.
+      LAZY_MODE: ${{ github.event_name == 'schedule' && 'latest' || 'pinned' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,19 +47,21 @@ jobs:
         id: nvim
         run: echo "version=$(nvim --version | head -1 | tr -d ' ')" >> "$GITHUB_OUTPUT"
 
-      # Restore the lazy.nvim plugin directory. The exact key (below) is the
-      # hash of the generated lock file, so an exact hit means identical plugin
-      # versions; the restore-keys prefixes warm-start from the latest cache for
-      # this OS + Neovim version when the versions have moved.
+      # Restore the lazy.nvim plugin directory. The key folds in the lockfile
+      # (the authoritative version identifier) and the plugin specs, so an exact
+      # hit means identical plugin versions; the restore-keys prefixes warm-start
+      # from the latest cache for this OS + Neovim version + mode when versions
+      # have moved. Mode is part of the key so the floating canary never feeds
+      # newer commits into the pinned cache.
       - name: Restore plugin cache
         id: cache
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.XDG_DATA_HOME }}/nvim/lazy
-          key: lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-${{ hashFiles('vim/lua/plugins/**/*.lua', 'vim/init.lua') }}
+          key: lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-${{ env.LAZY_MODE }}-${{ hashFiles('vim/lazy-lock.json', 'vim/lua/plugins/**/*.lua', 'vim/init.lua') }}
           restore-keys: |
+            lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-${{ env.LAZY_MODE }}-
             lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-
-            lazy-${{ runner.os }}-
 
       - name: Run config tests
         run: ./vim/tests/run.sh
@@ -71,4 +82,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ env.XDG_DATA_HOME }}/nvim/lazy
-          key: lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-${{ steps.lock.outputs.hash }}
+          key: lazy-${{ runner.os }}-${{ steps.nvim.outputs.version }}-${{ env.LAZY_MODE }}-${{ steps.lock.outputs.hash }}

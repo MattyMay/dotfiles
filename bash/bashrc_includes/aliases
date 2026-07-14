@@ -21,10 +21,10 @@ git config --global alias.subreset "!f() { \
 
 alias docker_clean_all='docker kill -f $(docker ps -q); docker rm -f $(docker ps --filter=status=exited --filter=status=created -q); docker rmi -f $(docker images -a -q);'
 
-if [[ ! -v $IS_SSH ]]; then
+if command -v nvim &> /dev/null; then
     alias vim='nvim'
-    alias wi='vim ~/vimwiki/index.md'
 fi
+alias wi='vim ~/vimwiki/index.md'
 
 alias claude-personal='CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude'
 alias claude-work='CLAUDE_CONFIG_DIR=$HOME/.claude-work claude'

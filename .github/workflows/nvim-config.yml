@@ -4,23 +4,34 @@ on:
   push:
     branches:
       - '**'
-  # Canary: float every plugin to its newest commit to catch upstream breakage
-  # before a local `:Lazy update` does. Runs on the default branch.
+  # Weekly canary, on the default branch. Two jobs, each changing one thing:
+  #   - pinned nvim + newest plugin commits: catches upstream plugin breakage
+  #     before a local `:Lazy update` does.
+  #   - newest nvim release + pinned plugins: catches nvim breakage before
+  #     vim/safe-update-nvim.sh installs the release.
   schedule:
     - cron: '0 6 * * 1'  # Mondays 06:00 UTC
-  # Allow triggering a normal run by hand. vim/safe-update-nvim.sh uses
-  # nvim_version to test a new release before installing it locally.
+  # Allow triggering a run by hand. vim/safe-update-nvim.sh uses nvim_version
+  # to test a new release before installing it locally.
   workflow_dispatch:
     inputs:
       nvim_version:
         description: 'Neovim version to test (e.g. v0.12.5); defaults to vim/.nvim-version'
         required: false
         default: ''
+      weekly:
+        description: 'Run the weekly canary jobs instead (ignores nvim_version)'
+        type: boolean
+        default: false
 
 jobs:
   test:
-    name: Verify Neovim config
+    name: Verify Neovim config (nvim ${{ matrix.nvim }}, plugins ${{ matrix.plugins }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON((github.event_name == 'schedule' || inputs.weekly) && '[{"nvim":"pinned","plugins":"latest"},{"nvim":"latest","plugins":"pinned"}]' || '[{"nvim":"pinned","plugins":"pinned"}]') }}
     timeout-minutes: 15
     env:
       # Isolated, cacheable XDG environment that vim/tests/run.sh will reuse.
@@ -28,9 +39,9 @@ jobs:
       XDG_DATA_HOME: ${{ github.workspace }}/.xdg/data
       XDG_STATE_HOME: ${{ github.workspace }}/.xdg/state
       XDG_CACHE_HOME: ${{ github.workspace }}/.xdg/cache
-      # Scheduled runs float to newest plugins (canary); everything else tests
-      # the exact versions pinned in lazy-lock.json.
-      LAZY_MODE: ${{ github.event_name == 'schedule' && 'latest' || 'pinned' }}
+      # "latest" floats plugins to their newest commits; "pinned" tests the
+      # exact versions in lazy-lock.json.
+      LAZY_MODE: ${{ matrix.plugins }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,8 +51,16 @@ jobs:
       - name: Resolve Neovim version
         id: nvim-pin
         env:
-          OVERRIDE: ${{ inputs.nvim_version }}
-        run: echo "version=${OVERRIDE:-$(cat vim/.nvim-version)}" >> "$GITHUB_OUTPUT"
+          GH_TOKEN: ${{ github.token }}
+          OVERRIDE: ${{ !inputs.weekly && inputs.nvim_version || '' }}
+          WANT_LATEST: ${{ matrix.nvim == 'latest' }}
+        run: |
+          if [ "$WANT_LATEST" = true ]; then
+            version=$(gh api repos/neovim/neovim/releases/latest --jq .tag_name)
+          else
+            version=${OVERRIDE:-$(cat vim/.nvim-version)}
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Install Neovim ${{ steps.nvim-pin.outputs.version }}
         uses: rhysd/action-setup-vim@v1

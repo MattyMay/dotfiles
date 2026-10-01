@@ -1,6 +1,6 @@
 # Neovim config
 
-Lua config managed with [lazy.nvim](https://github.com/folke/lazy.nvim). CI verifies the config loads and all plugins install cleanly on each push.
+Lua config managed with [lazy.nvim](https://github.com/folke/lazy.nvim). CI verifies the config loads and all plugins install cleanly on each push. A weekly run (Mondays) also tests the pinned nvim with the newest plugin commits, and the newest nvim release with the pinned plugins, so breakage from either side shows up before you update.
 
 ## Files
 
@@ -46,7 +46,7 @@ Or let CI vet the release first:
 ./vim/safe-update-nvim.sh
 ```
 
-It checks the latest scheduled or dispatched CI run. If that run is green on the latest release, it updates. If the run is red, it warns and asks before updating. If the run tested an older version, it offers to dispatch a CI run against the new release and wait for it, or to update without CI.
+It checks the latest scheduled or dispatched CI run, looking only at the jobs that tested the latest release. If they passed, it updates. If they failed, it warns and asks before updating. If no job tested the latest release, it offers to dispatch a CI run against the new release and wait for it, or to update without CI.
 
 ### Rolling back
 

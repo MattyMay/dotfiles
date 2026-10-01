@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 # Update nvim to the latest release, gated on the nvim-config CI workflow.
 #
-#   - Latest CI run is green and tested the latest release → update.
-#   - Latest CI run is red                                → warn, ask first.
-#   - Latest CI run tested an older version               → offer to dispatch a
+#   - Latest CI run tested the latest release and passed → update.
+#   - Latest CI run tested the latest release and failed → warn, ask first.
+#   - Latest CI run didn't test the latest release       → offer to dispatch a
 #     CI run against the latest release and wait, or update without CI.
+#
+# Only the jobs that tested the latest release count: the weekly run also has
+# a plugin canary job on the pinned nvim, whose result says nothing about
+# whether the new release works.
 #
 # Installation itself is delegated to update-nvim.sh.
 set -euo pipefail
@@ -24,20 +28,30 @@ confirm() {
 }
 
 # The workflow names its install step "Install Neovim <version>", so the
-# version a run tested is recoverable from its step names.
-run_tested_version() {
+# versions a run tested are recoverable from its step names.
+run_tested_versions() {
     gh run view "$1" --json jobs \
-        --jq '[.jobs[].steps[].name | capture("^Install Neovim (?<v>v\\S+)$").v][0] // ""'
+        --jq '[.jobs[].steps[].name | capture("^Install Neovim (?<v>v\\S+)$").v] | unique | join(", ")'
+}
+
+# Result of run $1's jobs that tested version $2: "success" if they all
+# passed, otherwise the first other conclusion; "" if no job tested it.
+version_result() {
+    gh run view "$1" --json jobs --jq "
+        [.jobs[] | select(any(.steps[]; .name == \"Install Neovim $2\")) | .conclusion]
+        | if length == 0 then \"\"
+          elif all(. == \"success\") then \"success\"
+          else map(select(. != \"success\"))[0] end"
 }
 
 # Most recent completed scheduled or manually dispatched run on $BRANCH, as
-# "id conclusion createdAt url". Push runs are ignored: they test whatever
+# "id createdAt url". Push runs are ignored: they test whatever
 # branch was pushed, not the weekly check.
 latest_run() {
     gh run list --workflow "$WORKFLOW" --branch "$BRANCH" --status completed -L 30 \
         --json databaseId,event,conclusion,createdAt,url \
         --jq '[.[] | select(.event == "schedule" or .event == "workflow_dispatch")][0]
-              | select(.) | "\(.databaseId) \(.conclusion) \(.createdAt) \(.url)"'
+              | select(.) | "\(.databaseId) \(.createdAt) \(.url)"'
 }
 
 workflow_state() {
@@ -78,14 +92,16 @@ dispatch_and_wait() {
     gh run watch "$id" --exit-status --interval 10 || true
 
     RUN_ID="$id"
-    RUN_CONCLUSION=$(gh run view "$id" --json conclusion --jq .conclusion)
     RUN_URL=$(gh run view "$id" --json url --jq .url)
-    RUN_VERSION=$(run_tested_version "$id")
+    RUN_RESULT=$(version_result "$id" "$version")
+    # A run that died before installing nvim has no matching job; use the
+    # run's own conclusion so it reads as a failure.
+    [[ -n "$RUN_RESULT" ]] || RUN_RESULT=$(gh run view "$id" --json conclusion --jq .conclusion)
 }
 
 do_update() {
     "$UPDATE_SCRIPT" --version "$1"
-    if [[ "$RUN_VERSION" == "$1" && "$RUN_CONCLUSION" == "success" ]]; then
+    if [[ "$RUN_RESULT" == "success" ]]; then
         echo
         echo "CI is green on $1. To record it: $UPDATE_SCRIPT --pin && git add vim/.nvim-version"
     fi
@@ -102,10 +118,10 @@ current=$(nvim --version 2>/dev/null | awk 'NR==1{print $2}' || true)
 echo "Latest: $latest   Installed: ${current:-none}"
 [[ "$current" == "$latest" ]] && { echo "Already up to date."; exit 0; }
 
-RUN_ID="" RUN_CONCLUSION="" RUN_URL="" RUN_VERSION=""
-if read -r RUN_ID RUN_CONCLUSION run_date RUN_URL < <(latest_run) && [[ -n "$RUN_ID" ]]; then
-    RUN_VERSION=$(run_tested_version "$RUN_ID")
-    echo "Last CI run: $RUN_CONCLUSION on ${RUN_VERSION:-unknown version} (${run_date%T*})"
+RUN_ID="" RUN_URL="" RUN_RESULT=""
+if read -r RUN_ID run_date RUN_URL < <(latest_run) && [[ -n "$RUN_ID" ]]; then
+    RUN_RESULT=$(version_result "$RUN_ID" "$latest")
+    echo "Last CI run (${run_date%T*}) tested: $(run_tested_versions "$RUN_ID")"
     echo "  $RUN_URL"
     if [[ "$(workflow_state)" != "active" ]]; then
         echo "  note: $WORKFLOW is disabled, so the weekly run isn't happening."
@@ -114,7 +130,7 @@ else
     echo "No completed scheduled or dispatched CI run found."
 fi
 
-if [[ "$RUN_VERSION" != "$latest" ]]; then
+if [[ -z "$RUN_RESULT" ]]; then
     echo
     echo "CI hasn't tested $latest yet."
     echo "  [r] run CI against $latest and wait for results"
@@ -128,12 +144,12 @@ if [[ "$RUN_VERSION" != "$latest" ]]; then
     esac
 fi
 
-if [[ "$RUN_CONCLUSION" == "success" ]]; then
+if [[ "$RUN_RESULT" == "success" ]]; then
     echo "CI is green on $latest. Updating."
     do_update "$latest"
 else
     echo
-    echo "WARNING: the CI run for $latest finished with '$RUN_CONCLUSION'."
+    echo "WARNING: the CI run for $latest finished with '$RUN_RESULT'."
     echo "  $RUN_URL"
     if confirm "Update to $latest anyway?"; then
         do_update "$latest"

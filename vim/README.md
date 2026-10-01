@@ -16,6 +16,7 @@ vim/
 │   ├── lint.lua           Lua syntax check
 │   └── verify.lua         runtime assertions
 ├── update-nvim.sh         install / upgrade / rollback script
+├── safe-update-nvim.sh    upgrade to latest, gated on CI results
 └── .nvim-version          pinned neovim version used by CI
 ```
 
@@ -38,6 +39,14 @@ The file `.nvim-version` records the version that CI runs against. When the test
 # 4. Commit
 git add vim/.nvim-version && git commit -m "nvim: bump to vX.Y.Z"
 ```
+
+Or let CI vet the release first:
+
+```bash
+./vim/safe-update-nvim.sh
+```
+
+It checks the latest scheduled or dispatched CI run. If that run is green on the latest release, it updates. If the run is red, it warns and asks before updating. If the run tested an older version, it offers to dispatch a CI run against the new release and wait for it, or to update without CI.
 
 ### Rolling back
 

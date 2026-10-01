@@ -8,8 +8,14 @@ on:
   # before a local `:Lazy update` does. Runs on the default branch.
   schedule:
     - cron: '0 6 * * 1'  # Mondays 06:00 UTC
-  # Allow triggering the canary (or a normal run) by hand.
-  workflow_dispatch: {}
+  # Allow triggering a normal run by hand. vim/safe-update-nvim.sh uses
+  # nvim_version to test a new release before installing it locally.
+  workflow_dispatch:
+    inputs:
+      nvim_version:
+        description: 'Neovim version to test (e.g. v0.12.5); defaults to vim/.nvim-version'
+        required: false
+        default: ''
 
 jobs:
   test:
@@ -29,9 +35,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Read pinned Neovim version
+      # The "Install Neovim <version>" step name below is read by
+      # vim/safe-update-nvim.sh to tell which version a run tested.
+      - name: Resolve Neovim version
         id: nvim-pin
-        run: echo "version=$(cat vim/.nvim-version)" >> "$GITHUB_OUTPUT"
+        env:
+          OVERRIDE: ${{ inputs.nvim_version }}
+        run: echo "version=${OVERRIDE:-$(cat vim/.nvim-version)}" >> "$GITHUB_OUTPUT"
 
       - name: Install Neovim ${{ steps.nvim-pin.outputs.version }}
         uses: rhysd/action-setup-vim@v1

@@ -28,4 +28,29 @@ return {
     build = "./install --all",
   },
   { "junegunn/fzf.vim" },
+
+  {
+    "ibhagwan/fzf-lua",
+    dependencies = { "junegunn/fzf" },
+    opts = function()
+      -- fzf's install script leaves the binary in the plugin dir, not on PATH.
+      local bin = require("lazy.core.config").plugins.fzf.dir .. "/bin/fzf"
+      return {
+        fzf_bin = vim.fn.executable("fzf") == 1 and "fzf" or bin,
+      }
+    end,
+    config = function(_, opts)
+      require("fzf-lua").setup(opts)
+      local map_opts = { noremap = true, silent = true }
+      vim.keymap.set("n", "<space>a", "<cmd>FzfLua diagnostics_workspace<CR>", map_opts)
+      vim.keymap.set("n", "<space>e", "<cmd>Mason<CR>", map_opts)
+      vim.keymap.set("n", "<space>c", "<cmd>FzfLua commands<CR>", map_opts)
+      vim.keymap.set("n", "<space>o", "<cmd>FzfLua lsp_document_symbols<CR>", map_opts)
+      vim.keymap.set("n", "<space>s", "<cmd>FzfLua lsp_live_workspace_symbols<CR>", map_opts)
+      vim.keymap.set("n", "<space>p", "<cmd>FzfLua resume<CR>", map_opts)
+      -- Step through a list sent to quickfix (alt-q in any picker).
+      vim.keymap.set("n", "<space>j", "<cmd>cnext<CR>", map_opts)
+      vim.keymap.set("n", "<space>k", "<cmd>cprev<CR>", map_opts)
+    end,
+  },
 }

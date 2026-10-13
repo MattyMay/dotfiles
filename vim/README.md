@@ -20,6 +20,18 @@ vim/
 └── .nvim-version          pinned neovim version used by CI
 ```
 
+## Treesitter
+
+Uses nvim-treesitter's `main` branch, which is the only branch that supports nvim 0.12. `plugins/treesitter.lua` installs the listed parsers and any other parser a filetype needs, then enables highlighting and indent for each buffer. Building parsers needs the [tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/releases) 0.26.1 or newer on PATH, and a C compiler. Don't install the CLI with npm. CI downloads a pinned release binary.
+
+## Language servers
+
+LSP uses nvim's built-in client (`plugins/lsp.lua`), with server configs from nvim-lspconfig. The first interactive start installs any missing servers, plus prettier, through [mason](https://github.com/mason-org/mason.nvim). Most of them need Node.js on PATH. `<space>e` opens `:Mason`. Headless runs (tests, CI) skip the install.
+
+To add a server, append its lspconfig name to `servers` in `plugins/lsp.lua`.
+
+Vue 2 projects use Volar 2.2.8 (`vue_ls_vue2` + `vtsls_vue2`), the version coc-volar ran. Vue 3 projects use mason's current Volar (`vue_ls` + `vtsls`). The choice depends on the `vue` version in the nearest `package.json`. mason holds only one version of each package, so npm installs the pinned 2.2.8 set into `stdpath("data")/vue2-language-server` on the first interactive start. To change the pins, edit `vue2.packages`.
+
 ## Neovim version
 
 The file `.nvim-version` records the version that CI runs against. When the tests pass on a given version, that version is committed here so the green badge means something specific.

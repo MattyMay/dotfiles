@@ -28,7 +28,14 @@ local ok_lazy, lazy_config = pcall(require, "lazy.core.config")
 check("lazy.nvim is loaded", ok_lazy)
 local plugins = ok_lazy and lazy_config.plugins or {}
 for _, name in ipairs({
-  "coc.nvim",
+  "nvim-lspconfig",
+  "mason.nvim",
+  "mason-lspconfig.nvim",
+  "blink.cmp",
+  "conform.nvim",
+  "gitsigns.nvim",
+  "fzf-lua",
+  "nvim-treesitter-textobjects",
   "tokyonight.nvim",
   "nvim-treesitter",
   "lualine.nvim",
@@ -51,9 +58,6 @@ check("colorscheme is tokyonight-moon", vim.g.colors_name == "tokyonight-moon")
 check("Comment highlight is italic", vim.api.nvim_get_hl(0, { name = "Comment" }).italic == true)
 
 -- ── Plugin g: vars set via init() (must apply before each plugin loads) ──────
-check("coc_global_extensions is a list", type(vim.g.coc_global_extensions) == "table")
-check("coc-pyright extension configured", vim.tbl_contains(vim.g.coc_global_extensions or {}, "coc-pyright"))
-check("coc-lua extension configured", vim.tbl_contains(vim.g.coc_global_extensions or {}, "coc-lua"))
 check("tmux_navigator_no_mappings = 1", vim.g.tmux_navigator_no_mappings == 1)
 check("emmet expand key is <leader><tab>", vim.g.user_emmet_expandabbr_key == "<leader><tab>")
 check("NERDTreeWinPos is right", vim.g.NERDTreeWinPos == "right")
@@ -79,32 +83,97 @@ check("swapfile disabled", vim.o.swapfile == false)
 check("Q is disabled", has_map("n", "Q"))
 check("<C-h> tmux navigation", has_map("n", "<C-h>"))
 check("<C-\\> NERDTree toggle", has_map("n", "<C-\\>"))
-check("K shows docs (coc)", has_map("n", "K"))
-check("gd goto definition (coc)", has_map("n", "gd"))
-check("<Tab> completion (coc)", has_map("i", "<Tab>"))
+check("]g next diagnostic", has_map("n", "]g"))
+check("<space>o document symbols (fzf-lua)", has_map("n", "<space>o"))
 
--- ── CoC helper + user commands (plugins/coc.lua config) ──────────────────────
-check("check_backspace global helper", type(_G.check_backspace) == "function")
+-- ── Language servers (plugins/lsp.lua) ───────────────────────────────────────
+for _, name in ipairs({
+  "bashls", "clangd", "cssls", "eslint", "html", "jsonls",
+  "lua_ls", "pyright", "vimls", "vtsls", "vue_ls",
+}) do
+  check("LSP enabled: " .. name, vim.lsp.is_enabled(name))
+end
+local vue_ls = vim.lsp.config.vue_ls or {}
+check("vue_ls rich hover", vim.tbl_get(vue_ls, "settings", "vue", "hover", "rich") == true)
+local ts_plugins = vim.tbl_get(vim.lsp.config.vtsls or {}, "settings", "vtsls", "tsserver", "globalPlugins") or {}
+check("vtsls loads @vue/typescript-plugin", ts_plugins[1] ~= nil and ts_plugins[1].name == "@vue/typescript-plugin")
+check("vtsls attaches to vue", vim.tbl_contains(vim.tbl_get(vim.lsp.config.vtsls or {}, "filetypes") or {}, "vue"))
+
+-- Vue 2 projects route away from Volar 3 (to vue_ls_vue2/vtsls_vue2).
+for _, name in ipairs({ "vtsls_vue2", "vue_ls_vue2" }) do
+  check("LSP enabled: " .. name, vim.lsp.is_enabled(name))
+end
+local function vue_buffer(vue_range)
+  local dir = vim.fn.tempname()
+  vim.fn.mkdir(dir, "p")
+  vim.fn.writefile({ vim.json.encode({ dependencies = { vue = vue_range } }) }, dir .. "/package.json")
+  local b = vim.api.nvim_create_buf(true, false)
+  vim.api.nvim_buf_set_name(b, dir .. "/App.vue")
+  return b
+end
+local function attaches(name, b)
+  local root
+  vim.lsp.config[name].root_dir(b, function(dir) root = dir end)
+  return root ~= nil
+end
+local vue2_buf, vue3_buf = vue_buffer("^2.7.16"), vue_buffer("^3.5.0")
+check("vue_ls skips Vue 2 projects", not attaches("vue_ls", vue2_buf))
+check("vtsls skips Vue 2 projects", not attaches("vtsls", vue2_buf))
+check("vue_ls attaches to Vue 3 projects", attaches("vue_ls", vue3_buf))
+check("vtsls attaches to Vue 3 projects", attaches("vtsls", vue3_buf))
+check("vue_ls_vue2 skips Vue 3 projects", not attaches("vue_ls_vue2", vue3_buf))
+check("vtsls_vue2 skips Vue 3 projects", not attaches("vtsls_vue2", vue3_buf))
+
+-- LSP keymaps are buffer-local, set on LspAttach; fire just our handler.
+local buf = vim.api.nvim_get_current_buf()
+vim.api.nvim_exec_autocmds("LspAttach", { group = "lsp_attach", buffer = buf, data = { client_id = -1 } })
+local function has_buf_map(mode, lhs)
+  return vim.fn.maparg(lhs, mode, false, true).buffer == 1
+end
+check("K shows docs (LspAttach)", has_buf_map("n", "K"))
+check("gd goto definition (LspAttach)", has_buf_map("n", "gd"))
+check("gr references doesn't wait on grr", vim.fn.maparg("gr", "n", false, true).nowait == 1)
+check("<leader>rn rename (LspAttach)", has_buf_map("n", "<leader>rn"))
+check("<leader>f format operator (LspAttach)", has_buf_map("n", "<leader>f"))
+
 local cmds = vim.api.nvim_get_commands({})
 check("Format command", cmds.Format ~= nil)
 check("Prettier command", cmds.Prettier ~= nil)
-check("CocSplitIfNotOpen command", cmds.CocSplitIfNotOpen ~= nil)
+check("OR command", cmds.OR ~= nil)
+check("Fold command", cmds.Fold ~= nil)
 
--- ── Treesitter configured ────────────────────────────────────────────────────
-check("nvim-treesitter.configs loadable", (pcall(require, "nvim-treesitter.configs")))
-
--- ── Regression: coc's <CR> survives in coc's prompt buffer ───────────────────
--- Make sure other plugins don't clobber coc's <CR> in prompt buffers, breaking
--- symbol renaming.
-local ok_prompt = pcall(vim.fn["coc#dialog#create_prompt_win"], "Rename", "oldName", {})
-check("coc prompt float can be created", ok_prompt)
-if ok_prompt then
-  vim.cmd("doautocmd InsertEnter")
-  local cr = vim.fn.maparg("<CR>", "i")
-  check("coc's <CR> confirm not clobbered in prompt buffer",
-    cr:find("coc#dialog#prompt_insert", 1, true) ~= nil)
-  pcall(vim.fn["coc#float#close_all"])
+-- ── Treesitter (plugins/treesitter.lua) ──────────────────────────────────────
+local installed = require("nvim-treesitter").get_installed()
+for _, lang in ipairs({ "vue", "typescript", "python", "markdown" }) do
+  check("parser installed: " .. lang, vim.tbl_contains(installed, lang))
 end
+local ts_buf = vim.api.nvim_create_buf(true, false)
+vim.bo[ts_buf].filetype = "python"
+check("treesitter highlighting starts on FileType", vim.treesitter.highlighter.active[ts_buf] ~= nil)
+check("treesitter indentexpr set", vim.bo[ts_buf].indentexpr:find("nvim-treesitter", 1, true) ~= nil)
+check("af function text object (textobjects)", has_map("o", "af"))
+check("ic class text object (textobjects)", has_map("x", "ic"))
+
+-- Regression: nvim-treesitter master's injection directives broke on nvim 0.12,
+-- so any LSP hover with a fenced code block threw from the highlighter.
+local function parses(lang, lines)
+  local b = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(b, 0, -1, false, lines)
+  return (pcall(function() vim.treesitter.get_parser(b, lang):parse(true) end))
+end
+check("markdown code fence injection parses", parses("markdown", { "```html", "<div></div>", "```" }))
+check("html <script type> injection parses", parses("html", { '<script type="text/javascript">let a = 1</script>' }))
+
+-- ── Completion: blink's <CR> isn't clobbered by pear-tree ────────────────────
+-- Both map <CR> buffer-locally on InsertEnter; blink must apply last so <CR>
+-- accepts a completion (it falls back to pear-tree's mapping otherwise).
+-- blink registers its InsertEnter autocmd once its fuzzy library is checked.
+vim.wait(5000, function() return package.loaded["blink.cmp.keymap.apply"] ~= nil end)
+vim.cmd("enew")
+vim.cmd("doautocmd InsertEnter")
+local cr = vim.fn.maparg("<CR>", "i", false, true)
+check("blink's <CR> wins over pear-tree's", (cr.desc or ""):find("blink.cmp", 1, true) ~= nil)
+check("<Tab> completion (blink)", (vim.fn.maparg("<Tab>", "i", false, true).desc or ""):find("blink.cmp", 1, true) ~= nil)
 
 emit(("\n%d check(s) failed"):format(failures))
 vim.cmd(failures > 0 and "cq" or "qa")

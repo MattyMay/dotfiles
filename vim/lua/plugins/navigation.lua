@@ -25,7 +25,8 @@ return {
 
   {
     "junegunn/fzf",
-    build = "./install --all",
+    -- --bin only: --all rewrites ~/.fzf.bash and rc files; bash setup lives in fzf_config
+    build = "./install --bin",
   },
   { "junegunn/fzf.vim" },
 

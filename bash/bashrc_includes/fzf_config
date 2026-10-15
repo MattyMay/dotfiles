@@ -49,8 +49,15 @@
 #     https://bluz71.github.io/2018/11/26/fuzzy-finding-in-bash-with-fzf.html
 
 ############## DEPENDENCY CHECKS ##############
+# prefer the fzf binary that lazy.nvim builds over any (older) system fzf
+FZF_BIN="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/lazy/fzf/bin"
+if [ -x "$FZF_BIN/fzf" ] && [[ ":$PATH:" != *":$FZF_BIN:"* ]]; then
+    export PATH="$FZF_BIN:$PATH"
+fi
+unset FZF_BIN
+
 # if fzf is not installed, print a warning and return
-if ! command -v fzf &> /dev/null && [ ! -f ~/.fzf.bash ]; then
+if ! command -v fzf &> /dev/null; then
     echo "fzf not installed. Install fzf to use fzf_config"
     return
 fi
@@ -78,8 +85,8 @@ export FZF_DEFAULT_OPTS="
     --bind ctrl-b:page-up,ctrl-f:page-down,ctrl-u:half-page-up,ctrl-d:half-page-down,ctrl-o:toggle-preview
 "
 
-# enable fzf keybinds
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# enable fzf keybinds and completion
+eval "$(fzf --bash)"
 
 
 ############## HELPER FUNCTIONS ###############

@@ -95,6 +95,30 @@ for _, name in ipairs({
 end
 local vue_ls = vim.lsp.config.vue_ls or {}
 check("vue_ls rich hover", vim.tbl_get(vue_ls, "settings", "vue", "hover", "rich") == true)
+-- Rich hover's HTML table, as Volar 3 builds it, becomes markdown.
+local rich_hover = table.concat({
+  "<table>",
+  '<tr><th align="left">Prop</th><th align="left">Description</th><th align="left">Default</th></tr>',
+  "<tr>\n\t\t<td>modelValue <sup><em>required</em></sup> <sup><em>model</em></sup></td>",
+  "\t\t<td>\n\nThe value.\nSecond line.<br><code>string</code></td>",
+  "\t\t<td><code>'a'</code></td>\n\t</tr>",
+  "<tr>\n\t\t<td><del>old</del></td>\n\t\t<td><code>`on${string}`</code></td>\n\t\t<td></td>\n\t</tr>",
+  "\n<tr></tr><tr></tr>\n",
+  '<tr><th align="left">Exposed</th><th align="left">Description</th><th></th></tr>',
+  '<tr>\n\t\t<td>focus</td>\n\t\t<td colspan="2"><code>() => void</code></td>\n\t</tr>',
+  "</table>",
+}, "\n")
+check("vue rich hover becomes markdown", require("vue_hover").to_markdown(rich_hover) == table.concat({
+  "**Props**",
+  "- `modelValue` *(required)* *(model)*: `string` = `'a'`",
+  "  The value.",
+  "  Second line.",
+  "- ~~`old`~~: `` `on${string}` ``",
+  "",
+  "**Exposed**",
+  "- `focus`: `() => void`",
+}, "\n"))
+check("vue plain hover is left alone", require("vue_hover").to_markdown("```ts\nconst x: number\n```") == nil)
 local ts_plugins = vim.tbl_get(vim.lsp.config.vtsls or {}, "settings", "vtsls", "tsserver", "globalPlugins") or {}
 check("vtsls loads @vue/typescript-plugin", ts_plugins[1] ~= nil and ts_plugins[1].name == "@vue/typescript-plugin")
 check("vtsls attaches to vue", vim.tbl_contains(vim.tbl_get(vim.lsp.config.vtsls or {}, "filetypes") or {}, "vue"))

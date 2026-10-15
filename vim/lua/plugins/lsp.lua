@@ -228,7 +228,17 @@ return {
         .. "/mason/packages/vue-language-server/node_modules/@vue/language-server"), {
         root_dir = only_if(not_vue2, vtsls_defaults.root_dir),
       }))
+      -- vim.lsp.buf.hover bypasses client handlers, so rich hover's HTML
+      -- table gets rewritten as markdown at the rpc layer instead.
+      local vue_ls_cmd = vim.lsp.config.vue_ls.cmd
       vim.lsp.config("vue_ls", {
+        cmd = function(dispatchers, config)
+          return require("vue_hover").wrap_rpc(vim.lsp.rpc.start(vue_ls_cmd, dispatchers, {
+            cwd = config.cmd_cwd,
+            env = config.cmd_env,
+            detached = config.detached,
+          }))
+        end,
         root_dir = only_if(not_vue2, package_root),
         settings = { vue = { hover = { rich = true } } },
       })

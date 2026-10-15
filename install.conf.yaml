@@ -28,8 +28,6 @@
       path: vim/lua/**
     ~/.ideavimrc:
       path: misc/ideavimrc
-    ~/.config/nvim/coc-settings.json:
-      path: vim/coc-settings.json
 
     ## vim filetype config
     ~/.vim/after/ftplugin/vimwiki.vim:

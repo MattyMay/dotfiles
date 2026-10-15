@@ -101,8 +101,6 @@ for FILE in $INCLUDES_DIR/*; do
     source $FILE
 done
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
 # >>> juliaup initialize >>>
 
 # !! Contents within this block are managed by juliaup !!

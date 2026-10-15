@@ -9,8 +9,9 @@
 #   3. Installs the plugins with lazy.nvim.
 #   4. Asserts the runtime configuration matches expectations.
 #
-# Safe to run locally or in CI. Requires `nvim` on PATH (Node.js as well for a
-# full coc.nvim run, though the checks here don't depend on it).
+# Safe to run locally or in CI. Requires `nvim` and `tree-sitter` (0.26.1+) on
+# PATH. Language servers are not installed (mason skips that in headless runs);
+# the checks don't need them.
 
 set -euo pipefail
 
@@ -45,7 +46,9 @@ quiet() {
 }
 
 echo "==> [1/3] Lua syntax check"
-run nvim --headless --clean -c "luafile $REPO_ROOT/vim/tests/lint.lua" +qa
+# The scripts exit via :qa/:cq themselves; the trailing +cq only runs if one
+# dies with a Lua error, so that fails the run instead of exiting 0.
+run nvim --headless --clean -c "luafile $REPO_ROOT/vim/tests/lint.lua" +cq
 
 echo
 echo "==> [2/3] Installing plugins in an isolated environment"
@@ -73,7 +76,6 @@ fi
 rm -rf "$XDG_CONFIG_HOME/nvim"
 mkdir -p "$XDG_CONFIG_HOME/nvim/lua"
 ln -sf "$REPO_ROOT/vim/init.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
-ln -sf "$REPO_ROOT/vim/coc-settings.json" "$XDG_CONFIG_HOME/nvim/coc-settings.json"
 for entry in "$REPO_ROOT"/vim/lua/*; do
   ln -sf "$entry" "$XDG_CONFIG_HOME/nvim/lua/$(basename "$entry")"
 done
@@ -100,14 +102,18 @@ case "${LAZY_MODE:-pinned}" in
     ;;
 esac
 
-# Install parsers now so verify's async auto_install doesn't scribble over it.
+# Install the parsers listed in plugins/treesitter.lua (the config skips this in
+# headless runs). Building them needs the tree-sitter CLI and a C compiler.
 quiet nvim --headless \
-  -c 'lua require("nvim-treesitter.install").ensure_installed_sync(unpack(require("nvim-treesitter.configs").get_ensure_installed_parsers()))' \
-  +qa
+  -c 'lua local p = require("lazy.core.config").plugins["nvim-treesitter"]
+      local opts = require("lazy.core.plugin").values(p, "opts", false)
+      assert(require("nvim-treesitter").install(opts.ensure_installed):wait(600000))
+      vim.cmd("qa")' \
+  +cq
 
 echo
 echo "==> [3/3] Verifying runtime configuration"
-run nvim --headless -c "luafile $REPO_ROOT/vim/tests/verify.lua" +qa
+run nvim --headless -c "luafile $REPO_ROOT/vim/tests/verify.lua" +cq
 
 echo
 echo "==> All checks passed"

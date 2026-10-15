@@ -49,8 +49,20 @@
 #     https://bluz71.github.io/2018/11/26/fuzzy-finding-in-bash-with-fzf.html
 
 ############## DEPENDENCY CHECKS ##############
+# prefer the fzf binary that lazy.nvim builds over any (older) system fzf
+FZF_BIN="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/lazy/fzf/bin"
+if [ -x "$FZF_BIN/fzf" ]; then
+    # move it to the front even if already present: the old ~/.fzf.bash
+    # appended it, and tmux/re-sourced shells inherit that PATH
+    PATH=":$PATH:"
+    PATH="${PATH//:$FZF_BIN:/:}"
+    PATH="${PATH#:}"
+    export PATH="$FZF_BIN:${PATH%:}"
+fi
+unset FZF_BIN
+
 # if fzf is not installed, print a warning and return
-if ! command -v fzf &> /dev/null && [ ! -f ~/.fzf.bash ]; then
+if ! command -v fzf &> /dev/null; then
     echo "fzf not installed. Install fzf to use fzf_config"
     return
 fi
@@ -78,8 +90,8 @@ export FZF_DEFAULT_OPTS="
     --bind ctrl-b:page-up,ctrl-f:page-down,ctrl-u:half-page-up,ctrl-d:half-page-down,ctrl-o:toggle-preview
 "
 
-# enable fzf keybinds
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# enable fzf keybinds and completion
+eval "$(fzf --bash)"
 
 
 ############## HELPER FUNCTIONS ###############
@@ -121,7 +133,10 @@ get_preview() {
 get_preview_window() {
     local command=$1
     local rows cols
-    read rows cols < <(stty -F /dev/stderr size)
+    read rows cols < <(stty -F /dev/stderr size 2>/dev/null)
+    # stderr may not be a terminal; fall back to bash's tracked size
+    rows=${rows:-${LINES:-0}}
+    cols=${cols:-${COLUMNS:-0}}
 
     # calculate actual rows based on fzf height
     rows=$(($rows * $FZF_HEIGHT_PERCENT / 100))
@@ -154,7 +169,10 @@ get_header() {
 }
 
 ############## FZF COMMANDS ###################
-alias fp="fzf --preview='$(get_preview)' --preview-window='$(get_preview_window)'"
+# a function, not an alias, so the preview window fits the terminal at call time
+fp() {
+    fzf --preview="$(get_preview)" --preview-window="$(get_preview_window)" "$@"
+}
 
 # fzf_from_dir [-H] [dir]
 # Run fzf on a list of files from $1 if provided, otherwise from cwd.

@@ -48,7 +48,6 @@ for _, name in ipairs({
   "vim-matchup",
   "vim-clang-format",
   "vim-fugitive",
-  "fzf.vim",
 }) do
   check("plugin spec present: " .. name, plugins[name] ~= nil)
 end
@@ -85,6 +84,9 @@ check("<C-h> tmux navigation", has_map("n", "<C-h>"))
 check("<C-\\> NERDTree toggle", has_map("n", "<C-\\>"))
 check("]g next diagnostic", has_map("n", "]g"))
 check("<space>o document symbols (fzf-lua)", has_map("n", "<space>o"))
+for _, cmd in ipairs({ "Files", "GFiles", "Rg", "Buffers", "History" }) do
+  check(":" .. cmd .. " command (fzf-lua)", vim.fn.exists(":" .. cmd) == 2)
+end
 
 -- ── Language servers (plugins/lsp.lua) ───────────────────────────────────────
 for _, name in ipairs({

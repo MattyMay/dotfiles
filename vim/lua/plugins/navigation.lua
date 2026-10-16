@@ -28,7 +28,6 @@ return {
     -- --bin only: --all rewrites ~/.fzf.bash and rc files; bash setup lives in fzf_config
     build = "./install --bin",
   },
-  { "junegunn/fzf.vim" },
 
   {
     "ibhagwan/fzf-lua",
@@ -42,6 +41,9 @@ return {
     end,
     config = function(_, opts)
       require("fzf-lua").setup(opts)
+      -- fzf.vim's commands (:Files, :Rg, :Buffers, ...) backed by fzf-lua. Just the
+      -- commands from the fzf-vim profile, not its window/preview styling.
+      require("fzf-lua.profiles.fzf-vim").fn_load()
       local map_opts = { noremap = true, silent = true }
       vim.keymap.set("n", "<space>a", "<cmd>FzfLua diagnostics_workspace<CR>", map_opts)
       vim.keymap.set("n", "<space>e", "<cmd>Mason<CR>", map_opts)

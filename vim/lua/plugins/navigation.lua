@@ -44,6 +44,14 @@ return {
       -- fzf.vim's commands (:Files, :Rg, :Buffers, ...) backed by fzf-lua. Just the
       -- commands from the fzf-vim profile, not its window/preview styling.
       require("fzf-lua.profiles.fzf-vim").fn_load()
+      -- The profile's :Rg prompts for a pattern first. fzf.vim's opens straight
+      -- away on every line and fuzzy-filters their contents; grep_project does that.
+      vim.api.nvim_create_user_command("Rg", function(o)
+        require("fzf-lua").grep_project({
+          search = o.args,
+          winopts = o.bang and { fullscreen = true } or nil,
+        })
+      end, { bang = true, nargs = "*", force = true })
       local map_opts = { noremap = true, silent = true }
       vim.keymap.set("n", "<space>a", "<cmd>FzfLua diagnostics_workspace<CR>", map_opts)
       vim.keymap.set("n", "<space>e", "<cmd>Mason<CR>", map_opts)

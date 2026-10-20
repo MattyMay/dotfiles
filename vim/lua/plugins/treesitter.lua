@@ -44,6 +44,11 @@ return {
       end
 
       local function enable(buf, lang)
+        -- A parser without highlight queries (e.g. a leftover master build on
+        -- the rtp) would switch off regex syntax and leave the buffer plain.
+        if not vim.treesitter.query.get(lang, "highlights") then
+          return
+        end
         if not pcall(vim.treesitter.start, buf, lang) then
           return
         end
